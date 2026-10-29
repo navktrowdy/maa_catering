@@ -140,6 +140,17 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 .prep td.num { text-align: right; white-space: nowrap; font-weight: 600; padding-left: 10px; }
 .chip { display: inline-block; margin-top: 4px; font-size: 11.5px; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: #face0b; color: #3d0e06; }
 
+.locked { margin: 16px 0 0; padding: 12px 16px; border-radius: 12px; border: 1px dashed var(--border-medium); font-size: 13.5px; color: var(--foreground-muted); text-align: center; }
+.confirm { width: min(520px, calc(100% - 32px)); max-height: calc(100vh - 48px); overflow: auto; border: 1px solid var(--accent-primary); border-radius: 16px; padding: 28px; background: var(--background-elevated); color: var(--foreground); }
+.confirm::backdrop { background: rgba(0,0,0,0.6); }
+.confirm h2 { font-size: 22px; margin-bottom: 6px; }
+.confirm-meta { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin: 18px 0; font-size: 14.5px; }
+.confirm-meta dt { color: var(--accent-primary); }
+.confirm-meta dd { margin: 0; }
+.confirm-items { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--border-subtle); }
+.confirm-items li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px dashed var(--border-subtle); font-size: 14.5px; }
+.confirm-items li span:last-child { color: var(--accent-primary); font-weight: 600; white-space: nowrap; }
+.confirm-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; flex-wrap: wrap; }
 .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); opacity: 0; background: var(--accent-primary); color: var(--background); padding: 12px 22px; border-radius: 999px; font-weight: 600; transition: opacity .25s, transform .25s; pointer-events: none; max-width: calc(100% - 32px); text-align: center; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -192,7 +203,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
           </select>
         </label>
       </div>
-      <label class="check"><input type="checkbox" id="packing" checked> Include packaging ($25 under 30 pax, $30 for 30+)</label>
+      <label class="check"><input type="checkbox" id="packing" checked> Include packaging</label>
       <p class="hint" style="margin-top:10px" id="group-hint"></p>
     </section>
 
@@ -267,15 +278,19 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   </div>
 
   <aside class="panel summary" aria-labelledby="sum-h" aria-live="polite">
-    <h2 id="sum-h">Estimate</h2>
+    <h2 id="sum-h">Order</h2>
     <p class="for" id="for"></p>
     <ul class="lines" id="lines"></ul>
-    <div class="sums" id="sums"></div>
-    <div class="total"><span>Total</span><span class="big" id="total">$0</span></div>
-    <p class="per-head" id="perhead"></p>
+    <div id="price-box" hidden>
+      <div class="sums" id="sums"></div>
+      <div class="total"><span>Total</span><span class="big" id="total">$0</span></div>
+      <p class="per-head" id="perhead"></p>
+    </div>
+    <p class="locked" id="price-locked">Prices are hidden until the order is confirmed.</p>
     <div class="warnings" id="warnings"></div>
     <div class="saved" id="saved" hidden></div>
     <div class="actions">
+      <button type="button" class="btn btn-solid" id="review">Review &amp; confirm order</button>
       <button type="button" class="btn btn-solid" id="copy">Copy WhatsApp quote</button>
       <button type="button" class="btn btn-ghost" id="save">Save enquiry to sheet</button>
       <button type="button" class="btn btn-ghost" id="new">Start new enquiry</button>
@@ -291,6 +306,17 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   </aside>
 </main>
 </div>
+
+<dialog class="confirm" id="confirm" aria-labelledby="confirm-h">
+  <h2 id="confirm-h">Confirm the order</h2>
+  <p class="hint">Check these details with the customer. Prices appear once you confirm.</p>
+  <dl class="confirm-meta" id="confirm-meta"></dl>
+  <ul class="confirm-items" id="confirm-items"></ul>
+  <div class="confirm-actions">
+    <button type="button" class="btn btn-ghost" id="confirm-back">Go back</button>
+    <button type="button" class="btn btn-solid" id="confirm-ok">Confirm &amp; show price</button>
+  </div>
+</dialog>
 
 <div class="toast" id="toast" role="status"></div>
 
@@ -509,7 +535,7 @@ function compute() {
   for (const a of ADDONS) {
     if (!active(a)) continue;
     const q = qty[a.id], u = UNIT[a.unit];
-    lines.push({ group: a.cat, name: a.name, detail: `${u.qty(q)} × ${money(a.price)}`, amt: round2(q * a.price), quote: `${a.name.replace(' — extra batch', ' (extra)')} — ${u.qty(q)}` });
+    lines.push({ group: a.cat, name: a.name, qtyText: u.qty(q), detail: `${u.qty(q)} × ${money(a.price)}`, amt: round2(q * a.price), quote: `${a.name.replace(' — extra batch', ' (extra)')} — ${u.qty(q)}` });
   }
   if (biryaniPax) {
     // Free raita & salna sits right after the biryani lines
@@ -520,7 +546,7 @@ function compute() {
   for (const x of custom) {
     const name = x.name.trim(), q = Math.max(0, round2(Number(x.qty) || 0)), p = Math.max(0, Number(x.price) || 0);
     if (!name || !q) continue;
-    lines.push({ group: 'Other items', name, detail: `${q} × ${money(p)}`, amt: round2(q * p), quote: `${name} — ${q}` });
+    lines.push({ group: 'Other items', name, qtyText: `${q}`, detail: `${q} × ${money(p)}`, amt: round2(q * p), quote: `${name} — ${q}` });
   }
 
   const food = round2(lines.reduce((t, l) => t + l.amt, 0));
@@ -549,7 +575,7 @@ function renderAddons() {
       cat = a.cat;
       html += `<h3 class="addon-cat">${cat}${CAT_NOTE[cat] ? ` <span class="hint" style="font-family:var(--font-body)">· ${CAT_NOTE[cat]}</span>` : ''}</h3>`;
     }
-    const meta = [`${money(a.price)} ${a.each || UNIT[a.unit].each}`, a.min && `min ${a.min}`, a.note].filter(Boolean).join(' · ');
+    const meta = [a.each || UNIT[a.unit].each, a.min && `min ${a.min}`, a.note].filter(Boolean).join(' · ');
     html += `<div class="addon${on[a.id] ? '' : ' off'}" data-row="${a.id}">
       <div><div class="addon-name">${a.name}${a.veg ? '<span class="tag-veg">VEG</span>' : ''}</div><div class="addon-meta">${meta}</div></div>
       <div class="addon-ctl">
@@ -689,17 +715,30 @@ function whatsappText(c) {
   ].join('\n');
 }
 
+// Prices stay hidden until staff confirm the order. Confirming records a
+// fingerprint of the priced order; any change that alters it hides prices again.
 let last = null;
+let confirmedSig = '';
+const priceSig = c => JSON.stringify([c.lines.map(l => [l.name, l.amt]), c.total]);
+const isConfirmed = () => last && last.lines.length && priceSig(last) === confirmedSig;
+
 function update() {
   const c = compute();
   last = c;
+  const shown = isConfirmed();
 
   let html = '', group = '';
   for (const l of c.lines) {
     if (l.group !== group) { group = l.group; html += `<li class="group">${group}</li>`; }
-    html += `<li${l.included ? ' class="incl"' : ''}><div>${l.name}<small>${l.detail}</small></div><span class="amt">${l.included ? 'Included' : money(l.amt)}</span></li>`;
+    const amt = l.included ? 'Included' : shown ? money(l.amt) : '';
+    html += `<li${l.included ? ' class="incl"' : ''}><div>${l.name}<small>${shown ? l.detail : (l.qtyText || l.detail)}</small></div><span class="amt">${amt}</span></li>`;
   }
-  $('lines').innerHTML = html || '<li class="empty" style="border:none">Switch items On in the menu to build the quote.</li>';
+  $('lines').innerHTML = html || '<li class="empty" style="border:none">Switch items On in the menu to build the order.</li>';
+  $('price-box').hidden = !shown;
+  $('price-locked').hidden = shown || !c.lines.length;
+  $('review').hidden = shown || !c.lines.length;
+  $('group-hint').hidden = !shown;
+  $('sum-h').textContent = shown ? 'Quote' : 'Order';
 
   const sums = [];
   if (c.groupPct) {
@@ -722,9 +761,42 @@ function update() {
   renderApproval();
 }
 
+// ---------- Review & confirm ----------
+function openReview() {
+  const c = last;
+  if (!c.lines.length) { toast('Switch items On in the menu first'); return; }
+  if (!c.s.guests) { $('guests').focus(); toast('Enter the number of guests first'); return; }
+  const meta = [
+    ['Guests', [`${c.s.guests}`, c.s.veg && `${c.s.veg} vegetarian`].filter(Boolean).join(' · ')],
+    ['Date', c.s.date ? fmtDate(c.s.date) : 'Not set'],
+    ['Time', c.s.time ? fmtTime(c.s.time) : 'Not set'],
+    ['Pickup / delivery', c.s.fulfil]
+  ];
+  if (c.pct) meta.push(['Discount', `${c.pct}%`]);
+  $('confirm-meta').innerHTML = meta.map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`).join('');
+  $('confirm-items').innerHTML = c.lines.map(l => `<li><span>${esc(l.name)}</span><span>${esc(l.included ? 'Included' : (l.qtyText || l.detail))}</span></li>`).join('');
+  $('confirm').showModal();
+}
+
+function needsConfirm() {
+  if (isConfirmed()) return false;
+  toast('Review and confirm the order first');
+  return true;
+}
+
+$('review').addEventListener('click', openReview);
+$('confirm-back').addEventListener('click', () => $('confirm').close());
+$('confirm-ok').addEventListener('click', () => {
+  if (blockedByApproval()) { $('confirm').close(); return; }
+  confirmedSig = priceSig(last);
+  $('confirm').close();
+  update();
+  $('price-box').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
 // ---------- Copy & save ----------
 $('copy').addEventListener('click', async () => {
-  if (blockedByApproval()) return;
+  if (needsConfirm() || blockedByApproval()) return;
   try { await navigator.clipboard.writeText(whatsappText(last)); toast('Quote copied — paste it into WhatsApp'); }
   catch (err) { toast('Could not copy — select and copy manually'); }
 });
@@ -735,7 +807,7 @@ async function saveEnquiry() {
   if (!c.s.guests) { $('guests').focus(); toast('Enter the number of guests first'); return; }
   const missing = ['c-name', 'c-phone', 'c-staff'].find(id => !$(id).value.trim());
   if (missing) { $(missing).focus(); toast('Fill in the customer name, phone and your name'); return; }
-  if (blockedByApproval()) return;
+  if (needsConfirm() || blockedByApproval()) return;
 
   const btn = $('save');
   btn.disabled = true;
@@ -784,6 +856,7 @@ function newEnquiry() {
   custom = [];
   renderCustom();
   approval = { pct: 0, managerPin: '' };
+  confirmedSig = '';
   savedId = '';
   $('saved').hidden = true;
   $('save').disabled = false;
