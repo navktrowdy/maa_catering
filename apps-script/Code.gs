@@ -1,10 +1,14 @@
 /**
  * MaaMadurai catering enquiries — Google Apps Script web app.
  *
- * Paste into Extensions > Apps Script of the enquiries spreadsheet,
- * then deploy as a web app (see SETUP.md). The staff PIN lives in
- * Script Properties and is checked here, never in the web page.
+ * Works whether the script is attached to the spreadsheet or standalone:
+ * it opens the sheet by SPREADSHEET_ID. Deploy as a web app (see README.md).
+ *
+ * The staff PIN lives in Script Properties (key STAFF_PIN) and is checked
+ * here, never in the web page. Set it in Project Settings > Script properties,
+ * or with Catering > Set staff PIN when the script is attached to the sheet.
  */
+const SPREADSHEET_ID = '1ECXOxZxKnebCgnlqfLN0YcrzPPZFXbcrg04YN-IoDmA';
 const SHEET_NAME = 'Enquiries';
 const HEADERS = [
   'Enquiry ID', 'Logged at', 'Staff', 'Customer name', 'Phone', 'Email',
@@ -33,8 +37,12 @@ function promptForPin() {
   ui.alert('Staff PIN saved. Anyone using the calculator now needs the new PIN.');
 }
 
+function book() {
+  return SpreadsheetApp.openById(SPREADSHEET_ID);
+}
+
 function setupSheet() {
-  const ss = SpreadsheetApp.getActive();
+  const ss = book();
   const sh = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
   sh.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS])
     .setFontWeight('bold').setBackground('#7d1d0d').setFontColor('#face0b');
@@ -84,8 +92,7 @@ function saveEnquiry(q) {
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
-    const ss = SpreadsheetApp.getActive();
-    const sh = ss.getSheetByName(SHEET_NAME) || setupSheet();
+    const sh = book().getSheetByName(SHEET_NAME) || setupSheet();
     const id = 'MM-' + String(sh.getLastRow()).padStart(4, '0');
     sh.appendRow([
       id, new Date(), clean(q.staff), clean(q.name), clean(q.phone), clean(q.email),
