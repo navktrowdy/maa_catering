@@ -182,8 +182,28 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 <main class="layout">
   <div>
     <section class="panel" aria-labelledby="s1">
-      <div class="step-head"><span class="step-num">1</span><h2 id="s1">Guests &amp; event</h2></div>
+      <div class="step-head"><span class="step-num">1</span><h2 id="s1">Customer &amp; event</h2></div>
       <div class="fields">
+        <label class="field"><span>Customer name <em>*</em></span>
+          <input id="c-name" type="text" autocomplete="off" required>
+        </label>
+        <label class="field"><span>Phone <em>*</em></span>
+          <input id="c-phone" type="tel" inputmode="tel" autocomplete="off" placeholder="04__ ___ ___" required>
+        </label>
+        <label class="field">Email
+          <input id="c-email" type="email" autocomplete="off">
+        </label>
+        <label class="field">Event type
+          <select id="c-type">
+            <option>Birthday party</option>
+            <option>House-warming</option>
+            <option>Corporate lunch</option>
+            <option>Temple or cultural function</option>
+            <option>Wedding or reception</option>
+            <option>Community event</option>
+            <option>Other</option>
+          </select>
+        </label>
         <label class="field">Total guests
           <input id="guests" type="number" min="1" max="2000" step="1" inputmode="numeric" value="40">
         </label>
@@ -208,6 +228,12 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
         <label class="field" id="fee-field" hidden>Delivery fee ($)
           <input id="delfee" type="number" min="0" step="1" inputmode="decimal" value="55">
         </label>
+        <label class="field"><span>Your name or initials <em>*</em></span>
+          <input id="c-staff" type="text" maxlength="40" required>
+        </label>
+        <label class="field wide">Notes
+          <textarea id="c-notes" placeholder="Spice level, allergies, how they heard about us…"></textarea>
+        </label>
       </div>
       <label class="check"><input type="checkbox" id="packing" checked> Include packaging</label>
       <p class="hint" style="margin-top:10px" id="group-hint"></p>
@@ -229,39 +255,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
     </section>
 
     <section class="panel" aria-labelledby="s3">
-      <div class="step-head"><span class="step-num">3</span><h2 id="s3">Customer</h2></div>
-      <form class="fields" id="customer" autocomplete="off" onsubmit="return false">
-        <label class="field">Customer name <em>*</em>
-          <input id="c-name" type="text" required>
-        </label>
-        <label class="field">Phone <em>*</em>
-          <input id="c-phone" type="tel" inputmode="tel" placeholder="04__ ___ ___" required>
-        </label>
-        <label class="field">Email
-          <input id="c-email" type="email">
-        </label>
-        <label class="field">Event type
-          <select id="c-type">
-            <option>Birthday party</option>
-            <option>House-warming</option>
-            <option>Corporate lunch</option>
-            <option>Temple or cultural function</option>
-            <option>Wedding or reception</option>
-            <option>Community event</option>
-            <option>Other</option>
-          </select>
-        </label>
-        <label class="field">Your name or initials <em>*</em>
-          <input id="c-staff" type="text" maxlength="40" required>
-        </label>
-        <label class="field wide">Notes
-          <textarea id="c-notes" placeholder="Spice level, allergies, how they heard about us…"></textarea>
-        </label>
-      </form>
-    </section>
-
-    <section class="panel" aria-labelledby="s4">
-      <div class="step-head"><span class="step-num">4</span><h2 id="s4">Discount</h2></div>
+      <div class="step-head"><span class="step-num">3</span><h2 id="s3">Discount</h2></div>
       <div class="fields">
         <label class="field">Discount %
           <input id="disc" type="number" min="0" max="100" step="0.5" inputmode="decimal" value="0">
