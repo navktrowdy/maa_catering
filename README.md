@@ -14,8 +14,11 @@ The PIN is checked in the Apps Script, never in the page. This repository holds 
 
 1. Create a Google Sheet and put its ID in `SPREADSHEET_ID` at the top of `apps-script/Code.gs`.
 2. Create an Apps Script project (from the sheet's **Extensions > Apps Script**, or at script.google.com) and paste in `Code.gs`. Save.
-3. Set the PIN: **Project Settings** (gear icon) **> Script properties > Add script property**, property `STAFF_PIN`, value 4–8 digits. Save.
-   (If the script was made from the sheet, the sheet also gets a **Catering > Set staff PIN** menu.)
+3. Set the PINs: **Project Settings** (gear icon) **> Script properties > Add script property**:
+   - `STAFF_PIN` — 4–8 digits, for front-of-house staff
+   - `MANAGER_PIN` — 4–8 digits, approves discounts over 5%
+
+   (If the script was made from the sheet, the sheet also gets a **Catering** menu to set them.)
 4. **Deploy > New deployment > Web app**. Execute as **Me**, access **Anyone**. Copy the URL ending in `/exec`.
 5. In `index.html`, paste that URL into `const ENQUIRY_ENDPOINT = '';` near the top of the script. Commit and push.
 
@@ -27,5 +30,8 @@ request still needs the PIN. After 5 wrong PINs, checks pause for 10 minutes.
 - Each device remembers the PIN after the first unlock. **Forget the PIN on this device** (bottom of the estimate panel) clears it.
 - Saved enquiries get an ID like `MM-0012` and Status **New**; change it to Quoted, Confirmed or Lost in the sheet.
 - The **Enquiries** tab is created and formatted automatically on the first save.
-- Change the PIN by editing `STAFF_PIN` in Script properties. Staff are asked for the new one on their next save.
+- Staff can give up to 5% discount. Above that, a manager enters their PIN on the page to approve it; the sheet records the discount and **Manager approved: Yes**. The limit is `DISCOUNT_LIMIT` in both `index.html` and `Code.gs`.
+- **Copy WhatsApp quote** copies a plain-text quote with no per-item prices. The **Kitchen prep quantities** panel (meat, rice, starters, gravies, pre-order reminders) is for staff and is never copied.
+- Catering rates live in the `BIRYANI` and `ADDONS` lists near the top of the script in `index.html`. Prep assumptions (grams per head, 5% buffer, 4 L per gravy batch) are in `PREP`.
+- Change a PIN by editing it in Script properties. Staff are asked for the new one on their next save.
 - After editing `Code.gs`, use **Deploy > Manage deployments > Edit > New version** so the URL stays the same.

@@ -37,13 +37,13 @@ button { font-family: inherit; }
 .lock-card input { text-align: center; font-size: 26px; letter-spacing: 0.4em; }
 .lock-err { color: #ffb38a; font-size: 14px; margin: 0; min-height: 1.6em; }
 
-.hero { position: relative; text-align: center; padding: 48px 16px 28px; max-width: 860px; margin: 0 auto; }
+.hero { text-align: center; padding: 48px 16px 28px; max-width: 860px; margin: 0 auto; }
 .eyebrow { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent-primary); }
 .hero h1 { font-size: clamp(28px, 4.4vw, 48px); font-variant: small-caps; margin: 10px 0 14px; }
 .hero p { color: var(--foreground-muted); font-size: 17px; margin: 0; text-wrap: pretty; }
 .rule { width: 96px; height: 4px; background: var(--accent-primary); margin: 22px auto 0; }
 
-.layout { max-width: 1280px; margin: 0 auto; padding: 8px 16px 56px; display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 28px; align-items: start; }
+.layout { max-width: 1280px; margin: 0 auto; padding: 8px 16px 56px; display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 28px; align-items: start; }
 @media (max-width: 960px) { .layout { grid-template-columns: 1fr; } }
 
 .panel { background: var(--background-elevated); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 32px; }
@@ -53,17 +53,17 @@ button { font-family: inherit; }
 .step-num { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 999px; background: var(--accent-primary); color: var(--background); font-weight: 700; }
 .step-head h2 { font-size: 22px; }
 
-.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; }
 .fields .wide { grid-column: 1 / -1; }
 label.field { display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--foreground-muted); }
 label.field em { font-style: normal; color: var(--accent-primary); }
-input[type=number], input[type=date], input[type=text], input[type=tel], input[type=email], input[type=password], select, textarea { width: 100%; padding: 14px 16px; border-radius: 10px; border: 1px solid var(--border-subtle); background: rgba(0,0,0,0.28); color: var(--foreground); font-family: var(--font-body); font-size: 16px; min-height: 52px; color-scheme: dark; }
+input[type=number], input[type=date], input[type=time], input[type=text], input[type=tel], input[type=email], input[type=password], select, textarea { width: 100%; padding: 14px 16px; border-radius: 10px; border: 1px solid var(--border-subtle); background: rgba(0,0,0,0.28); color: var(--foreground); font-family: var(--font-body); font-size: 16px; min-height: 52px; color-scheme: dark; }
 select option { background: var(--background-elevated); }
 textarea { min-height: 100px; resize: vertical; }
-input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
 .hint { font-size: 13px; color: rgba(245,240,232,0.7); margin: 0; }
 
-.choice-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.choice-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
 .choice { position: relative; display: block; cursor: pointer; }
 .choice input { position: absolute; opacity: 0; pointer-events: none; }
 .choice span { display: flex; flex-direction: column; gap: 2px; height: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--border-subtle); background: var(--background-card); transition: border-color .2s, background .2s; }
@@ -71,7 +71,6 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 .choice span small { color: rgba(245,240,232,0.75); font-size: 12.5px; }
 .choice input:checked + span { border: 2px solid var(--accent-primary); padding: 13px 15px; background: rgba(250,206,11,0.1); }
 .choice input:focus-visible + span { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
-.sub-label { font-size: 14px; color: var(--foreground-muted); margin: 22px 0 10px; }
 
 .addon-tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 22px; border-radius: 999px; font-weight: 600; font-size: 15px; cursor: pointer; min-height: 46px; border: 1px solid var(--accent-primary); transition: background .2s, color .2s; }
@@ -84,15 +83,19 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 
 .addon-cat { font-family: var(--font-display); font-size: 17px; color: var(--accent-primary); margin: 24px 0 6px; }
 .addon { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-subtle); }
-.addon:last-child { border-bottom: none; }
 .addon-name { font-weight: 500; }
 .addon-meta { font-size: 13px; color: rgba(245,240,232,0.72); }
 .tag-veg { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .06em; color: var(--tag-veg); border: 1px solid var(--tag-veg); border-radius: 6px; padding: 0 5px; margin-left: 6px; vertical-align: 2px; }
 .stepper { display: inline-flex; align-items: center; border: 1px solid var(--border-medium); border-radius: 999px; overflow: hidden; background: rgba(0,0,0,0.2); }
 .stepper button { width: 40px; height: 40px; border: none; background: transparent; color: var(--accent-primary); font-size: 20px; cursor: pointer; }
 .stepper button:hover { background: rgba(250,206,11,0.15); }
-.stepper input { width: 48px; min-height: 0; height: 40px; padding: 0; text-align: center; border: none; border-radius: 0; background: transparent; -moz-appearance: textfield; }
+.stepper input { width: 56px; min-height: 0; height: 40px; padding: 0; text-align: center; border: none; border-radius: 0; background: transparent; -moz-appearance: textfield; }
 .stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.approval { margin-top: 18px; padding: 18px; border-radius: 12px; border: 1px solid var(--accent-primary); background: rgba(250,206,11,0.08); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: end; }
+@media (max-width: 600px) { .approval { grid-template-columns: 1fr; } }
+.approval .hint { grid-column: 1 / -1; }
+.approved { color: #9ff0b8; font-size: 14px; margin: 12px 0 0; }
 
 /* Summary */
 .summary { position: sticky; top: 20px; }
@@ -101,23 +104,40 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 .summary .for { color: var(--foreground-muted); font-size: 14px; margin: 0 0 18px; }
 .lines { list-style: none; margin: 0; padding: 0; }
 .lines li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--border-subtle); font-size: 14.5px; }
-.lines li .qty { color: var(--accent-primary); font-weight: 600; margin-right: 6px; }
 .lines li small { display: block; color: rgba(245,240,232,0.7); font-size: 12.5px; }
 .lines li .amt { font-weight: 600; white-space: nowrap; }
+.lines li.incl .amt { color: #9ff0b8; font-weight: 500; }
 .lines .group { border-bottom: none; padding: 16px 0 2px; font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-primary); }
 .empty { color: rgba(245,240,232,0.7); font-size: 14px; }
-.total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 18px; padding-top: 16px; border-top: 2px solid var(--accent-primary); }
+.sums { margin-top: 14px; font-size: 14.5px; }
+.sums div { display: flex; justify-content: space-between; padding: 4px 0; color: var(--foreground-muted); }
+.total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 10px; padding-top: 14px; border-top: 2px solid var(--accent-primary); }
 .total span:first-child { font-family: var(--font-display); font-size: 18px; }
 .total .big { font-size: 34px; font-weight: 700; color: var(--accent-primary); }
 .per-head { text-align: right; color: var(--foreground-muted); font-size: 14px; margin: 2px 0 0; }
-.coverage { margin-top: 18px; background: var(--background-card); border-radius: 12px; padding: 14px 16px; font-size: 13.5px; color: var(--foreground-muted); }
-.coverage b { color: var(--foreground); }
-.notice { margin-top: 14px; border-radius: 12px; padding: 12px 16px; font-size: 13.5px; background: rgba(232,106,36,0.16); border: 1px solid #e86a24; }
+.warnings { display: grid; gap: 10px; margin-top: 16px; }
+.warn { border-radius: 12px; padding: 12px 16px; font-size: 13.5px; font-weight: 500; background: #face0b; color: #3d0e06; }
+.warn.date { background: rgba(232,106,36,0.16); border: 1px solid #e86a24; color: var(--foreground); font-weight: 400; }
 .saved { margin-top: 14px; border-radius: 12px; padding: 12px 16px; font-size: 13.5px; background: rgba(34,197,94,0.14); border: 1px solid var(--tag-veg); }
 .saved b { color: var(--accent-primary); }
 .actions { display: grid; gap: 10px; margin-top: 20px; }
 .actions .btn { width: 100%; }
 .fine { font-size: 12.5px; color: rgba(245,240,232,0.62); margin: 16px 0 0; line-height: 1.7; }
+
+/* Kitchen prep (staff only) */
+.prep { margin-top: 20px; border: 1px dashed var(--border-medium); border-radius: 12px; background: rgba(0,0,0,0.18); }
+.prep summary { cursor: pointer; padding: 14px 16px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+.prep summary::-webkit-details-marker { display: none; }
+.prep summary::after { content: '+'; color: var(--accent-primary); font-size: 20px; }
+.prep[open] summary::after { content: '−'; }
+.prep summary small { display: block; font-weight: 400; font-size: 12px; color: rgba(245,240,232,0.65); }
+.prep-body { padding: 0 16px 14px; }
+.prep table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.prep th { text-align: left; font-weight: 500; font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-primary); padding: 12px 0 4px; }
+.prep td { padding: 7px 0; border-bottom: 1px dashed var(--border-subtle); vertical-align: top; }
+.prep td.num { text-align: right; white-space: nowrap; font-weight: 600; padding-left: 10px; }
+.chip { display: inline-block; margin-top: 4px; font-size: 11.5px; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: #face0b; color: #3d0e06; }
+
 .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); opacity: 0; background: var(--accent-primary); color: var(--background); padding: 12px 22px; border-radius: 999px; font-weight: 600; transition: opacity .25s, transform .25s; pointer-events: none; max-width: calc(100% - 32px); text-align: center; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -140,16 +160,16 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 
 <div id="app" hidden>
 <header class="hero">
-  <span class="eyebrow">MaaMadurai · Front of house</span>
+  <span class="eyebrow">MaaMadurai · Catering</span>
   <h1>Catering Calculator</h1>
-  <p>Size the buckets, starters and sides for a customer's function, quote the estimate, and log the enquiry to the spreadsheet.</p>
+  <p>Build a catering quote at catering rates, send it to the customer on WhatsApp, and log the enquiry to the spreadsheet.</p>
   <div class="rule"></div>
 </header>
 
 <main class="layout">
   <div>
     <section class="panel" aria-labelledby="s1">
-      <div class="step-head"><span class="step-num">1</span><h2 id="s1">Guests</h2></div>
+      <div class="step-head"><span class="step-num">1</span><h2 id="s1">Guests &amp; event</h2></div>
       <div class="fields">
         <label class="field">Total guests
           <input id="guests" type="number" min="1" max="2000" step="1" inputmode="numeric" value="40">
@@ -157,32 +177,39 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
         <label class="field">Of those, vegetarian
           <input id="veg" type="number" min="0" step="1" inputmode="numeric" value="0">
         </label>
+        <label class="field">Of those, children (under 10)
+          <input id="kids" type="number" min="0" step="1" inputmode="numeric" value="0">
+        </label>
         <label class="field">Event date
           <input id="date" type="date">
         </label>
-      </div>
-      <p class="sub-label">How hungry is the crowd?</p>
-      <div class="choice-group" role="radiogroup" aria-label="Appetite">
-        <label class="choice"><input type="radio" name="appetite" value="0.85"><span><b>Light</b><small>Lunch, lots of other food</small></span></label>
-        <label class="choice"><input type="radio" name="appetite" value="1" checked><span><b>Regular</b><small>Biryani is the main meal</small></span></label>
-        <label class="choice"><input type="radio" name="appetite" value="1.2"><span><b>Hearty</b><small>Big eaters, seconds expected</small></span></label>
+        <label class="field">Pickup / serving time
+          <input id="time" type="time" step="900">
+        </label>
+        <label class="field">Pickup or delivery
+          <select id="c-fulfil">
+            <option value="Pickup">Pickup from Portico Plaza</option>
+            <option value="Delivery">Delivery (to be confirmed)</option>
+          </select>
+        </label>
       </div>
     </section>
 
     <section class="panel" aria-labelledby="s2">
       <div class="step-head"><span class="step-num">2</span><h2 id="s2">Biryani</h2></div>
       <div class="choice-group" role="radiogroup" aria-label="Biryani">
-        <label class="choice"><input type="radio" name="biryani" value="chicken" checked><span><b>Madurai Chicken</b><small>Half $105 · Full $200</small></span></label>
-        <label class="choice"><input type="radio" name="biryani" value="mutton"><span><b>Seeraga Samba Mutton</b><small>Half $120 · Full $230</small></span></label>
-        <label class="choice"><input type="radio" name="biryani" value="mix"><span><b>Both, half-and-half</b><small>Split guests across the two</small></span></label>
+        <label class="choice"><input type="radio" name="biryani" value="chicken" checked><span><b>Madurai Chicken</b><small>$17 per head</small></span></label>
+        <label class="choice"><input type="radio" name="biryani" value="mutton"><span><b>Seeraga Samba / Basmati Mutton</b><small>$22 adult · $12 child</small></span></label>
+        <label class="choice"><input type="radio" name="biryani" value="mix"><span><b>Both, half-and-half</b><small>Non-veg guests split evenly</small></span></label>
+        <label class="choice"><input type="radio" name="biryani" value="none"><span><b>No biryani</b><small>Starters and sides only</small></span></label>
       </div>
-      <p class="hint" style="margin-top:14px">A half bucket feeds around 20 guests, a full bucket around 45. Every bucket comes with gravy and raita. Vegetarian guests get Vegetable Biryani by the plate.</p>
+      <p class="hint" style="margin-top:14px">Vegetarian guests get Veg Biryani at $14 per head. Raita and Biryani Salna are included with every biryani order (1 batch per ~30 pax). Children's pricing applies to mutton biryani only.</p>
     </section>
 
     <section class="panel" aria-labelledby="s3">
       <div class="step-head"><span class="step-num">3</span><h2 id="s3">Add to the spread</h2></div>
       <div class="addon-tools">
-        <p class="hint" style="max-width:420px">Priced per plate from the regular menu. Suggest quantities for the headcount, then adjust with the customer.</p>
+        <p class="hint" style="max-width:420px">Catering rates. Starters and dry sides are per head, breads and desserts per piece, gravies and coffee/tea per batch.</p>
         <div style="display:flex; gap:10px; align-items:center">
           <button type="button" class="btn btn-solid" id="suggest">Suggest for headcount</button>
           <button type="button" class="btn-link" id="clear">Clear</button>
@@ -192,7 +219,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
     </section>
 
     <section class="panel" aria-labelledby="s4">
-      <div class="step-head"><span class="step-num">4</span><h2 id="s4">Customer &amp; event</h2></div>
+      <div class="step-head"><span class="step-num">4</span><h2 id="s4">Customer</h2></div>
       <form class="fields" id="customer" autocomplete="off" onsubmit="return false">
         <label class="field">Customer name <em>*</em>
           <input id="c-name" type="text" required>
@@ -214,12 +241,6 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
             <option>Other</option>
           </select>
         </label>
-        <label class="field">Pickup or delivery
-          <select id="c-fulfil">
-            <option>Pickup from Portico Plaza</option>
-            <option>Delivery (to be confirmed)</option>
-          </select>
-        </label>
         <label class="field">Delivery suburb
           <input id="c-suburb" type="text">
         </label>
@@ -227,9 +248,28 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
           <input id="c-staff" type="text" maxlength="40" required>
         </label>
         <label class="field wide">Notes
-          <textarea id="c-notes" placeholder="Serving time, allergies, spice level, how they heard about us…"></textarea>
+          <textarea id="c-notes" placeholder="Spice level, allergies, how they heard about us…"></textarea>
         </label>
       </form>
+    </section>
+
+    <section class="panel" aria-labelledby="s5">
+      <div class="step-head"><span class="step-num">5</span><h2 id="s5">Discount</h2></div>
+      <div class="fields">
+        <label class="field">Discount %
+          <input id="disc" type="number" min="0" max="100" step="0.5" inputmode="decimal" value="0">
+        </label>
+      </div>
+      <p class="hint" style="margin-top:10px">Staff can give up to 5%. Anything more needs a manager's approval.</p>
+      <div class="approval" id="mgr" hidden>
+        <p class="hint"><b style="color:var(--accent-primary)">Manager approval needed</b> — ask a manager to enter their PIN.</p>
+        <label class="field">Manager PIN
+          <input id="mgr-pin" type="password" inputmode="numeric" autocomplete="off" maxlength="8">
+        </label>
+        <button type="button" class="btn btn-solid" id="approve">Approve</button>
+        <p class="lock-err" id="mgr-err" role="alert" style="grid-column:1/-1;text-align:left"></p>
+      </div>
+      <p class="approved" id="approved" hidden></p>
     </section>
   </div>
 
@@ -237,17 +277,23 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
     <h2 id="sum-h">Estimate</h2>
     <p class="for" id="for"></p>
     <ul class="lines" id="lines"></ul>
-    <div class="total"><span>Estimated total</span><span class="big" id="total">$0</span></div>
+    <div class="sums" id="sums"></div>
+    <div class="total"><span>Total</span><span class="big" id="total">$0</span></div>
     <p class="per-head" id="perhead"></p>
-    <div class="coverage" id="coverage"></div>
-    <div class="notice" id="notice" hidden></div>
+    <div class="warnings" id="warnings"></div>
     <div class="saved" id="saved" hidden></div>
     <div class="actions">
-      <button type="button" class="btn btn-solid" id="save">Save enquiry to sheet</button>
-      <button type="button" class="btn btn-ghost" id="copy">Copy estimate</button>
+      <button type="button" class="btn btn-solid" id="copy">Copy WhatsApp quote</button>
+      <button type="button" class="btn btn-ghost" id="save">Save enquiry to sheet</button>
       <button type="button" class="btn btn-ghost" id="new">Start new enquiry</button>
     </div>
-    <p class="fine">Quote this to the customer as an estimate at in-store prices (AUD, updated 12 September 2026). Final quantities and price are confirmed when they order. Delivery is by arrangement. Chicken and mutton are halal; one kitchen, so no allergen-free guarantee.</p>
+
+    <details class="prep" id="prep">
+      <summary><span>Kitchen prep quantities<small>Staff only — not in the customer quote</small></span></summary>
+      <div class="prep-body" id="prep-body"></div>
+    </details>
+
+    <p class="fine">Catering rates in AUD. Final quantities and price are confirmed when the customer orders. Delivery is by arrangement. Chicken and mutton are halal; one kitchen, so no allergen-free guarantee.</p>
     <p class="fine"><a href="#" id="forget" style="color:inherit">Forget the PIN on this device</a></p>
   </aside>
 </main>
@@ -258,37 +304,62 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 <script>
 // Paste the Apps Script web app URL between the quotes (see README.md)
 const ENQUIRY_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyuFAq43IYHRKg-O_PhDJgyWNPV3C1iGIwkx99FChVcDYKi0qc-HQkT-4XpdVOsI2n-/exec';
+const QUOTE_SIGNOFF = 'MaaMadurai Street Food\n0431 525 366';
 
-// Prices from Menu.dc.html / Catering.dc.html (in-store, updated 12 Sep 2026)
-const BUCKETS = {
-  chicken: { name: 'Madurai Chicken Biryani', half: 105, full: 200 },
-  mutton:  { name: 'Seeraga Samba Mutton Biryani', half: 120, full: 230 }
+// ---------- Catering rates ----------
+const BIRYANI = {
+  chicken: { name: 'Madurai Chicken Biryani', adult: 17, kid: 17 },
+  mutton:  { name: 'Seeraga Samba / Basmati Mutton Biryani', adult: 22, kid: 12 },
+  veg:     { name: 'Veg Biryani', adult: 14, kid: 14 }
 };
-const HALF_SERVES = 20, FULL_SERVES = 45;
-const VEG_BIRYANI = { name: 'Vegetable Biryani', price: 13.99 };
+const PAX_PER_BATCH = 30;                 // one gravy / raita / salna batch serves ~30
+const PACKAGING = { small: 25, large: 30, largeFrom: 30 };
+const DISCOUNT_LIMIT = 5;                 // must match DISCOUNT_LIMIT in Code.gs
 
-// per: suggested plates per N guests of the given audience (all / nonveg / veg)
+// Kitchen prep assumptions
+const PREP = { meatKg: 0.15, riceKg: 0.12, starterKg: 0.15, buffer: 1.05, gravyLitresPerBatch: 4 };
+const CHAMI_FROM = 60;                    // chicken pax that needs a pre-order from Chami
+const MUTTON_WARN_FROM = 20;              // mutton biryani pax that needs 3 days' notice
+
+// unit: pp = per head, ea = per piece, batch = per batch
+// kind: starter / side items get prep kg; meat: drives pre-order labels
 const ADDONS = [
-  { cat: 'Starters', id: 'c65',    name: 'Chicken 65',                  price: 13.99, per: 6, aud: 'nonveg' },
-  { cat: 'Starters', id: 'kola',   name: 'Madurai Kola Urundai (3 pcs)', price: 11.99, per: 6, aud: 'nonveg' },
-  { cat: 'Dry sides', id: 'pepch', name: 'Madurai Pepper Chicken',      price: 13.99, per: 8, aud: 'nonveg' },
-  { cat: 'Dry sides', id: 'chuk',  name: 'Madurai Mutton Chukka',       price: 15.99, per: 0, aud: 'nonveg' },
-  { cat: 'Parotta & gravy', id: 'par',  name: 'Plain Parotta (2 pcs)',  price: 6.99,  per: 4, aud: 'all', veg: true },
-  { cat: 'Parotta & gravy', id: 'cgr',  name: 'Chicken Gravy',          price: 6.99,  per: 0, aud: 'nonveg' },
-  { cat: 'Parotta & gravy', id: 'vgr',  name: 'Veg Gravy',              price: 5.99,  per: 4, aud: 'veg', veg: true },
-  { cat: 'Drinks & dessert', id: 'jig',  name: 'Madurai Jigarthanda',   price: 12.99, per: 0, veg: true },
-  { cat: 'Drinks & dessert', id: 'rose', name: 'Rose Milk',             price: 5.99,  per: 0, veg: true },
-  { cat: 'Drinks & dessert', id: 'lassi',name: 'Mango Lassi',           price: 5.99,  per: 0, veg: true },
-  { cat: 'Drinks & dessert', id: 'cof',  name: 'Filter Coffee',         price: 4.99,  per: 0, veg: true },
-  { cat: 'Drinks & dessert', id: 'tea',  name: 'Masala Tea',            price: 4.99,  per: 0, veg: true },
-  { cat: 'Drinks & dessert', id: 'goli', name: 'Goli Soda',             price: 5.99,  per: 0, veg: true },
-  { cat: 'Drinks & dessert', id: 'water',name: 'Bottled Water',         price: 2.99,  per: 0, veg: true }
+  { cat: 'Starters', id: 'c65b',  name: 'Chicken 65 (bone-in)',   price: 7,  unit: 'pp', kind: 'starter', meat: 'chicken', suggest: s => s.nonVeg },
+  { cat: 'Starters', id: 'c65l',  name: 'Chicken 65 (boneless)',  price: 8,  unit: 'pp', kind: 'starter', meat: 'chicken' },
+  { cat: 'Starters', id: 'gobi',  name: 'Gobi 65',                price: 6,  unit: 'pp', kind: 'starter', veg: true, suggest: s => s.veg },
+  { cat: 'Starters', id: 'kola',  name: 'Madurai Kola Urundai',   price: 6,  unit: 'pp', kind: 'starter', meat: 'mutton', note: '3 pcs per head' },
+  { cat: 'Dry sides', id: 'pepch', name: 'Madurai Pepper Chicken', price: 8,  unit: 'pp', kind: 'side', meat: 'chicken' },
+  { cat: 'Dry sides', id: 'chuk',  name: 'Madurai Mutton Chukka',  price: 10, unit: 'pp', kind: 'side', meat: 'mutton' },
+  { cat: 'Dry sides', id: 'pbm',   name: 'Paneer Butter Masala',   price: 12, unit: 'pp', kind: 'side', veg: true, min: 10 },
+  { cat: 'Breads', id: 'par',  name: 'Plain Parotta', price: 2.5, unit: 'ea', veg: true },
+  { cat: 'Breads', id: 'chap', name: 'Chapathi',      price: 2.5, unit: 'ea', veg: true },
+  { cat: 'Gravies', id: 'cgr',   name: 'Chicken Gravy',                    price: 55, unit: 'batch', gravy: true },
+  { cat: 'Gravies', id: 'vgr',   name: 'Veg / Kathirikai (Brinjal) Gravy', price: 50, unit: 'batch', gravy: true, veg: true },
+  { cat: 'Gravies', id: 'salna', name: 'Biryani Salna — extra batch',      price: 35, unit: 'batch', gravy: true, note: 'Included with biryani; add only for extra' },
+  { cat: 'Gravies', id: 'raita', name: 'Raita — extra batch',              price: 35, unit: 'batch', gravy: true, veg: true, note: 'Included with biryani; add only for extra' },
+  { cat: 'Desserts', id: 'rasm',  name: 'Rasmalai',    price: 1, unit: 'ea', veg: true, min: 100 },
+  { cat: 'Desserts', id: 'gulab', name: 'Gulab Jamun', price: 2, unit: 'ea', veg: true, note: 'Suggest 3 per head', suggest: s => s.guests * 3 },
+  { cat: 'Drinks', id: 'cof',   name: 'Filter Coffee',       price: 50,    unit: 'batch', veg: true, each: 'per 4L batch' },
+  { cat: 'Drinks', id: 'tea',   name: 'Masala Tea',          price: 40,    unit: 'batch', veg: true, each: 'per 4L batch' },
+  { cat: 'Drinks', id: 'jig',   name: 'Madurai Jigarthanda', price: 12.99, unit: 'ea', veg: true },
+  { cat: 'Drinks', id: 'rose',  name: 'Rose Milk',           price: 5.99,  unit: 'ea', veg: true },
+  { cat: 'Drinks', id: 'lassi', name: 'Mango Lassi',         price: 5.99,  unit: 'ea', veg: true },
+  { cat: 'Drinks', id: 'goli',  name: 'Goli Soda',           price: 5.99,  unit: 'ea', veg: true },
+  { cat: 'Drinks', id: 'water', name: 'Bottled Water',       price: 2.99,  unit: 'ea', veg: true }
 ];
+const UNIT = {
+  pp:    { each: 'per head',  qty: n => `${n} pax` },
+  ea:    { each: 'each',      qty: n => `${n} pcs` },
+  batch: { each: 'per batch', qty: n => `${n} batch${n === 1 ? '' : 'es'}` }
+};
+const CAT_NOTE = { Gravies: '1 batch serves ~30 pax' };
 const qty = Object.fromEntries(ADDONS.map(a => [a.id, 0]));
 
 const $ = id => document.getElementById(id);
 const money = n => n.toLocaleString('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
 const int = (v, min = 0) => Math.max(min, Math.floor(Number(v) || 0));
+const round2 = n => Math.round(n * 100) / 100;
+const kg = n => `${(Math.ceil(n * 10) / 10).toFixed(1)} kg`;
 const store = {
   get: (s, k) => { try { return s.getItem(k) || ''; } catch (e) { return ''; } },
   set: (s, k, v) => { try { v ? s.setItem(k, v) : s.removeItem(k); } catch (e) {} }
@@ -306,7 +377,7 @@ function toast(msg) {
 const PIN_ERRORS = {
   bad_pin: 'That PIN is not right.',
   locked: 'Too many wrong tries. Wait 10 minutes and try again.',
-  pin_not_set: 'No staff PIN is set yet. Use Catering > Set staff PIN in the spreadsheet.'
+  pin_not_set: 'No staff PIN is set yet. Add STAFF_PIN in the Apps Script project settings.'
 };
 let pin = store.get(localStorage, 'mc-pin');
 
@@ -351,35 +422,140 @@ $('lock-form').addEventListener('submit', async e => {
 });
 $('forget').addEventListener('click', e => { e.preventDefault(); lock(); });
 
-// ---------- Calculator ----------
-// Cheapest mix of full/half buckets that serves at least `n` guests.
-// Ties go to the plan with fewer leftover servings.
-function bucketPlan(n, b) {
-  if (n <= 0) return { full: 0, half: 0, cost: 0, serves: 0 };
-  let best = null;
-  for (let full = 0; full <= Math.ceil(n / FULL_SERVES); full++) {
-    const half = Math.ceil(Math.max(0, n - full * FULL_SERVES) / HALF_SERVES);
-    const cost = full * b.full + half * b.half;
-    const serves = full * FULL_SERVES + half * HALF_SERVES;
-    if (!best || cost < best.cost || (cost === best.cost && serves < best.serves)) best = { full, half, cost, serves };
-  }
-  return best;
+// ---------- Discount & manager approval ----------
+const MGR_ERRORS = {
+  bad_manager_pin: 'That manager PIN is not right.',
+  manager_locked: 'Too many wrong manager PINs. Wait 10 minutes.',
+  manager_pin_not_set: 'No manager PIN is set yet. Add MANAGER_PIN in the Apps Script project settings.'
+};
+let approval = { pct: 0, managerPin: '' };   // highest discount a manager has approved for this enquiry
+
+const discountPct = () => Math.min(100, Math.max(0, Number($('disc').value) || 0));
+const needsApproval = () => discountPct() > DISCOUNT_LIMIT && discountPct() > approval.pct;
+
+function renderApproval() {
+  const pct = discountPct();
+  $('mgr').hidden = !needsApproval();
+  const ok = pct > DISCOUNT_LIMIT && !needsApproval();
+  $('approved').hidden = !ok;
+  if (ok) $('approved').textContent = `Approved by a manager (up to ${approval.pct}%).`;
 }
 
+$('approve').addEventListener('click', async () => {
+  const entered = $('mgr-pin').value.trim();
+  if (!entered) { $('mgr-pin').focus(); return; }
+  $('approve').disabled = true;
+  $('mgr-err').textContent = '';
+  try {
+    const r = await callSheet({ action: 'approve', pin, managerPin: entered });
+    if (r.ok) {
+      approval = { pct: discountPct(), managerPin: entered };
+      $('mgr-pin').value = '';
+      toast(`${approval.pct}% discount approved`);
+    } else if (r.error === 'bad_pin' || r.error === 'locked') {
+      lock(); $('pin-err').textContent = 'The staff PIN has changed. Type the new one.';
+    } else {
+      $('mgr-err').textContent = MGR_ERRORS[r.error] || 'Could not check the manager PIN.';
+    }
+  } catch (err) {
+    $('mgr-err').textContent = 'Could not reach the spreadsheet. Check the internet connection.';
+  }
+  $('approve').disabled = false;
+  update();
+});
+
+function blockedByApproval() {
+  if (!needsApproval()) return false;
+  toast(`A discount over ${DISCOUNT_LIMIT}% needs manager approval first`);
+  $('mgr-pin').focus();
+  return true;
+}
+
+// ---------- Calculator ----------
 function readInputs() {
   const guests = int($('guests').value, 0);
   const veg = Math.min(int($('veg').value, 0), guests);
-  const appetite = Number(document.querySelector('input[name=appetite]:checked').value);
+  const kids = Math.min(int($('kids').value, 0), guests);
   const biryani = document.querySelector('input[name=biryani]:checked').value;
-  return { guests, veg, nonVeg: guests - veg, appetite, biryani, date: $('date').value };
+  return { guests, veg, kids, nonVeg: guests - veg, biryani, date: $('date').value, time: $('time').value, fulfil: $('c-fulfil').value };
+}
+
+// Who eats which biryani. Children are counted among the non-veg guests;
+// their price only differs for mutton.
+function biryaniSplit(s) {
+  const out = { chicken: 0, muttonAdults: 0, muttonKids: 0, veg: 0 };
+  if (s.biryani === 'none') return out;
+  const kidsNV = Math.min(s.kids, s.nonVeg);
+  if (s.biryani === 'chicken') out.chicken = s.nonVeg;
+  if (s.biryani === 'mutton') { out.muttonKids = kidsNV; out.muttonAdults = s.nonVeg - kidsNV; }
+  if (s.biryani === 'mix') {
+    const mutton = Math.floor(s.nonVeg / 2);
+    out.chicken = s.nonVeg - mutton;
+    out.muttonKids = s.nonVeg ? Math.round(kidsNV * mutton / s.nonVeg) : 0;
+    out.muttonAdults = mutton - out.muttonKids;
+  }
+  out.veg = s.veg;
+  return out;
+}
+
+function compute() {
+  const s = readInputs();
+  const b = biryaniSplit(s);
+  const muttonPax = b.muttonAdults + b.muttonKids;
+  const biryaniPax = b.chicken + muttonPax + b.veg;
+  const includedBatches = Math.ceil(biryaniPax / PAX_PER_BATCH);
+  const lines = [];   // { group, name, detail, amt, quote, record, included }
+
+  if (b.chicken) {
+    const B = BIRYANI.chicken;
+    lines.push({ group: 'Biryani', name: B.name, detail: `${b.chicken} pax × ${money(B.adult)}`, amt: b.chicken * B.adult, quote: `${B.name} — ${b.chicken} pax` });
+  }
+  if (muttonPax) {
+    const B = BIRYANI.mutton;
+    if (b.muttonAdults) lines.push({ group: 'Biryani', name: `${B.name} (adults)`, detail: `${b.muttonAdults} pax × ${money(B.adult)}`, amt: b.muttonAdults * B.adult });
+    if (b.muttonKids) lines.push({ group: 'Biryani', name: `${B.name} (children)`, detail: `${b.muttonKids} pax × ${money(B.kid)}`, amt: b.muttonKids * B.kid });
+    lines[lines.length - 1].quote = b.muttonKids
+      ? `${B.name} — ${b.muttonAdults} adults, ${b.muttonKids} children`
+      : `${B.name} — ${b.muttonAdults} pax`;
+  }
+  if (b.veg) {
+    const B = BIRYANI.veg;
+    lines.push({ group: 'Biryani', name: B.name, detail: `${b.veg} pax × ${money(B.adult)}`, amt: b.veg * B.adult, quote: `${B.name} — ${b.veg} pax` });
+  }
+  if (biryaniPax) {
+    lines.push({ group: 'Biryani', name: 'Raita & Biryani Salna', detail: `${includedBatches} batch${includedBatches === 1 ? '' : 'es'} each`, amt: 0, included: true, quote: 'Raita and Biryani Salna — included' });
+  }
+
+  for (const a of ADDONS) {
+    const q = qty[a.id];
+    if (!q) continue;
+    const u = UNIT[a.unit];
+    lines.push({ group: a.cat, name: a.name, detail: `${u.qty(q)} × ${money(a.price)}`, amt: q * a.price, quote: `${a.name.replace(' — extra batch', ' (extra)')} — ${u.qty(q)}` });
+  }
+
+  if (s.guests) {
+    const large = s.guests >= PACKAGING.largeFrom;
+    lines.push({ group: 'Packaging', name: large ? 'Large packaging' : 'Standard packaging', detail: large ? `${PACKAGING.largeFrom}+ pax` : `under ${PACKAGING.largeFrom} pax`, amt: large ? PACKAGING.large : PACKAGING.small, quote: 'Packaging' });
+  }
+
+  const subtotal = round2(lines.reduce((t, l) => t + l.amt, 0));
+  const pct = discountPct();
+  const discount = round2(subtotal * pct / 100);
+  const total = round2(subtotal - discount);
+  const perGuest = s.guests ? round2(total / s.guests) : 0;
+  return { s, b, muttonPax, biryaniPax, includedBatches, lines, subtotal, pct, discount, total, perGuest };
 }
 
 function renderAddons() {
   let html = '', cat = '';
   for (const a of ADDONS) {
-    if (a.cat !== cat) { cat = a.cat; html += `<h3 class="addon-cat">${cat}</h3>`; }
+    if (a.cat !== cat) {
+      cat = a.cat;
+      html += `<h3 class="addon-cat">${cat}${CAT_NOTE[cat] ? ` <span class="hint" style="font-family:var(--font-body)">· ${CAT_NOTE[cat]}</span>` : ''}</h3>`;
+    }
+    const meta = [`${money(a.price)} ${a.each || UNIT[a.unit].each}`, a.min && `min ${a.min}`, a.note].filter(Boolean).join(' · ');
     html += `<div class="addon">
-      <div><div class="addon-name">${a.name}${a.veg ? '<span class="tag-veg">VEG</span>' : ''}</div><div class="addon-meta">${money(a.price)} each</div></div>
+      <div><div class="addon-name">${a.name}${a.veg ? '<span class="tag-veg">VEG</span>' : ''}</div><div class="addon-meta">${meta}</div></div>
       <div class="stepper">
         <button type="button" data-id="${a.id}" data-d="-1" aria-label="One less ${a.name}">−</button>
         <input type="number" min="0" inputmode="numeric" data-id="${a.id}" value="${qty[a.id]}" aria-label="${a.name} quantity">
@@ -389,10 +565,16 @@ function renderAddons() {
   $('addons').innerHTML = html;
 }
 
+// Items with a minimum jump straight to it; stepping down from it drops to 0
+function setQty(a, n, stepping) {
+  n = int(n);
+  if (a.min && n > 0 && n < a.min) n = stepping && n < qty[a.id] ? 0 : a.min;
+  qty[a.id] = n;
+}
+
 function suggest() {
-  const { guests, veg, nonVeg, appetite } = readInputs();
-  const pool = { all: guests, nonveg: nonVeg, veg };
-  for (const a of ADDONS) qty[a.id] = a.per ? Math.ceil(pool[a.aud] * appetite / a.per) : 0;
+  const s = readInputs();
+  for (const a of ADDONS) setQty(a, a.suggest ? a.suggest(s) : 0);
   syncAddonInputs();
   update();
 }
@@ -401,112 +583,130 @@ function syncAddonInputs() {
   document.querySelectorAll('#addons input').forEach(i => { i.value = qty[i.dataset.id]; });
 }
 
-function noticeFor(date) {
-  if (!date) return '';
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const ev = new Date(date + 'T00:00:00');
-  const days = Math.round((ev - today) / 86400000);
-  if (days < 0) return 'That date has already passed — check the event date.';
-  if (days < 2) return 'Short notice: check with the kitchen before confirming this date.';
-  const weekend = ev.getDay() === 0 || ev.getDay() === 6;
-  if (weekend && days < 7) return 'Weekend function under a week away: check kitchen capacity before confirming.';
-  return '';
-}
-
-const APPETITE_LABEL = { '0.85': 'Light', '1': 'Regular', '1.2': 'Hearty' };
-const BIRYANI_LABEL = { chicken: 'Chicken', mutton: 'Mutton', mix: 'Chicken + Mutton' };
-let last = { text: '', lines: '', total: 0, perGuest: 0 };
-
-function update() {
-  const s = readInputs();
-  const text = [];
-
-  // Biryani
-  const eaters = Math.ceil(s.nonVeg * s.appetite);
-  const kinds = s.biryani === 'mix' ? ['chicken', 'mutton'] : [s.biryani];
-  const split = s.biryani === 'mix' ? [Math.ceil(eaters / 2), Math.floor(eaters / 2)] : [eaters];
-  let bucketServes = 0;
-  const biryaniLines = [];
-  kinds.forEach((k, i) => {
-    const b = BUCKETS[k], p = bucketPlan(split[i], b);
-    bucketServes += p.serves;
-    if (p.full) biryaniLines.push({ q: p.full, name: `Full bucket — ${b.name}`, note: `serves ~${FULL_SERVES} each`, amt: p.full * b.full });
-    if (p.half) biryaniLines.push({ q: p.half, name: `Half bucket — ${b.name}`, note: `serves ~${HALF_SERVES} each`, amt: p.half * b.half });
-  });
-  const vegPlates = Math.ceil(s.veg * s.appetite);
-  if (vegPlates) biryaniLines.push({ q: vegPlates, name: VEG_BIRYANI.name, note: `${money(VEG_BIRYANI.price)} per plate`, amt: vegPlates * VEG_BIRYANI.price });
-
-  const addonLines = ADDONS.filter(a => qty[a.id] > 0).map(a => ({ q: qty[a.id], name: a.name, note: `${money(a.price)} each`, amt: qty[a.id] * a.price }));
-
-  let total = 0, html = '';
-  const items = [];
-  const group = (title, arr) => {
-    if (!arr.length) return;
-    html += `<li class="group">${title}</li>`;
-    text.push('', title.toUpperCase());
-    for (const l of arr) {
-      total += l.amt;
-      html += `<li><div><span class="qty">${l.q}×</span>${l.name}<small>${l.note}</small></div><span class="amt">${money(l.amt)}</span></li>`;
-      text.push(`${l.q} x ${l.name} — ${money(l.amt)}`);
-      items.push(`${l.q} x ${l.name} — ${money(l.amt)}`);
-    }
-  };
-  group('Biryani', biryaniLines);
-  group('Add-ons', addonLines);
-  $('lines').innerHTML = html || '<li class="empty" style="border:none">Enter the headcount to see an estimate.</li>';
-  total = Math.round(total * 100) / 100;
-  const perGuest = s.guests ? Math.round(total / s.guests * 100) / 100 : 0;
-  $('total').textContent = money(total);
-  $('perhead').textContent = s.guests ? `about ${money(perGuest)} per guest` : '';
-
-  $('for').textContent = s.guests ? `${s.guests} guests${s.veg ? ` · ${s.veg} vegetarian` : ''} · ${APPETITE_LABEL[String(s.appetite)].toLowerCase()} appetite` : '';
-
-  let cov = '';
-  if (s.nonVeg) {
-    const spare = bucketServes - s.nonVeg;
-    cov = `Buckets serve about <b>${bucketServes}</b> for <b>${s.nonVeg}</b> non-veg guests`;
-    cov += spare > 0 ? ` — roughly ${spare} extra serves for seconds.` : '.';
-    if (s.biryani === 'mix') cov += ' Guests are split evenly between chicken and mutton.';
-  } else if (s.guests) {
-    cov = 'All-vegetarian function — check bulk vegetable biryani pricing with the kitchen.';
+function warningsFor(c) {
+  const out = [];
+  if (c.s.date) {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const ev = new Date(c.s.date + 'T00:00:00');
+    const days = Math.round((ev - today) / 86400000);
+    if (days < 0) out.push({ date: true, text: 'That date has already passed — check the event date.' });
+    else if (days < 2) out.push({ date: true, text: 'Short notice: check with the kitchen before confirming this date.' });
+    if (ev.getDay() === 6) out.push({ text: 'Saturday booking — confirm kitchen capacity with Nalini before quoting' });
   }
-  $('coverage').innerHTML = cov;
-  $('coverage').hidden = !cov;
-
-  const n = noticeFor(s.date);
-  $('notice').textContent = n;
-  $('notice').hidden = !n;
-
-  last = {
-    total, perGuest, lines: items.join('\n'),
-    text: [
-      'MaaMadurai catering estimate',
-      `${$('for').textContent}${s.date ? ` · event ${s.date}` : ''}`,
-      ...text,
-      '',
-      `Estimated total: ${money(total)}${s.guests ? ` (${$('perhead').textContent})` : ''}`,
-      'In-store prices, to be confirmed when ordering. Call 0424 077 120.'
-    ].join('\n')
-  };
+  if (c.muttonPax >= MUTTON_WARN_FROM) out.push({ text: 'Pre-order mutton from Sakayanathan at least 3 days ahead' });
+  if (qty.c65b + qty.c65l >= CHAMI_FROM) out.push({ text: 'Pre-order chicken from Chami' });
+  return out;
 }
 
-// ---------- Save to spreadsheet ----------
+function prepHtml(c) {
+  const rows = [];
+  const chip = meat => meat === 'mutton' ? '<span class="chip">Pre-order: Sakayanathan</span>' : '';
+  const chickenChip = pax => pax >= CHAMI_FROM ? '<span class="chip">Pre-order: Chami</span>' : '';
+  const row = (label, value, extra = '') => `<tr><td>${label}${extra ? '<br>' + extra : ''}</td><td class="num">${value}</td></tr>`;
+
+  const meat = [];
+  if (c.b.chicken) meat.push(row(`Chicken — biryani (${c.b.chicken} pax)`, kg(c.b.chicken * PREP.meatKg * PREP.buffer), chickenChip(c.b.chicken)));
+  if (c.muttonPax) meat.push(row(`Mutton — biryani (${c.muttonPax} pax)`, kg(c.muttonPax * PREP.meatKg * PREP.buffer), chip('mutton')));
+  if (meat.length) rows.push('<tr><th colspan="2">Meat</th></tr>', ...meat);
+  if (c.biryaniPax) rows.push('<tr><th colspan="2">Rice</th></tr>', row(`Biryani rice (${c.biryaniPax} pax)`, kg(c.biryaniPax * PREP.riceKg * PREP.buffer)));
+
+  const starters = ADDONS.filter(a => (a.kind === 'starter' || a.kind === 'side') && qty[a.id]).map(a =>
+    row(`${a.name} (${qty[a.id]} pax)`, kg(qty[a.id] * PREP.starterKg * PREP.buffer), a.meat === 'chicken' ? chickenChip(qty[a.id]) : chip(a.meat)));
+  if (starters.length) rows.push('<tr><th colspan="2">Starters &amp; sides</th></tr>', ...starters);
+
+  const L = PREP.gravyLitresPerBatch;
+  const gravies = [];
+  if (c.includedBatches) {
+    gravies.push(row(`Biryani Salna (${c.includedBatches + qty.salna} batch)`, `${(c.includedBatches + qty.salna) * L} L`));
+    gravies.push(row(`Raita (${c.includedBatches + qty.raita} batch)`, `${(c.includedBatches + qty.raita) * L} L`));
+  }
+  for (const a of ADDONS.filter(a => a.gravy && qty[a.id])) {
+    if (c.includedBatches && (a.id === 'salna' || a.id === 'raita')) continue;
+    gravies.push(row(`${a.name.replace(' — extra batch', '')} (${qty[a.id]} batch)`, `${qty[a.id] * L} L`));
+  }
+  if (gravies.length) rows.push(`<tr><th colspan="2">Gravies · ${L} L per batch</th></tr>`, ...gravies);
+
+  if (!rows.length) return '<p class="hint" style="padding-top:4px">Nothing to prep yet.</p>';
+  return `<table>${rows.join('')}</table><p class="hint" style="margin-top:10px">Meat ${PREP.meatKg * 1000} g, rice ${PREP.riceKg * 1000} g and starters ${PREP.starterKg * 1000} g per head, plus 5% buffer.</p>`;
+}
+
+const fmtDate = d => new Date(d + 'T00:00:00').toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+const fmtTime = t => { const [h, m] = t.split(':').map(Number); return `${(h % 12) || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'am' : 'pm'}`; };
+const BIRYANI_LABEL = { chicken: 'Chicken', mutton: 'Mutton', mix: 'Chicken + Mutton', none: 'None' };
+
+function whatsappText(c) {
+  const name = $('c-name').value.trim();
+  const when = [c.s.date && `on ${fmtDate(c.s.date)}`, c.s.time && `at ${fmtTime(c.s.time)}`].filter(Boolean).join(' ');
+  const items = c.lines.filter(l => l.quote).map(l => l.quote);
+  if (c.pct) items.push(`Discount — ${c.pct}%`);
+  return [
+    `Hi ${name || 'there'},`,
+    '',
+    `Here is the quote for your event${when ? ' ' + when : ''} (${c.s.fulfil}):`,
+    '',
+    ...items,
+    '',
+    `Total: ${money(c.total)}${c.s.guests ? ` (${money(c.perGuest)} per head)` : ''}`,
+    '',
+    'Please confirm to proceed.',
+    '',
+    QUOTE_SIGNOFF
+  ].join('\n');
+}
+
+let last = null;
+function update() {
+  const c = compute();
+  last = c;
+
+  let html = '', group = '';
+  for (const l of c.lines) {
+    if (l.group !== group) { group = l.group; html += `<li class="group">${group}</li>`; }
+    html += `<li${l.included ? ' class="incl"' : ''}><div>${l.name}<small>${l.detail}</small></div><span class="amt">${l.included ? 'Included' : money(l.amt)}</span></li>`;
+  }
+  $('lines').innerHTML = html || '<li class="empty" style="border:none">Enter the headcount to see an estimate.</li>';
+
+  $('sums').innerHTML = c.pct
+    ? `<div><span>Subtotal</span><span>${money(c.subtotal)}</span></div><div><span>Discount (${c.pct}%)</span><span>−${money(c.discount)}</span></div>`
+    : '';
+  $('total').textContent = money(c.total);
+  $('perhead').textContent = c.s.guests ? `${money(c.perGuest)} per head` : '';
+  $('for').textContent = c.s.guests
+    ? [`${c.s.guests} guests`, c.s.veg && `${c.s.veg} vegetarian`, c.s.kids && `${c.s.kids} children`].filter(Boolean).join(' · ')
+    : '';
+
+  $('warnings').innerHTML = warningsFor(c).map(w => `<div class="warn${w.date ? ' date' : ''}">${w.text}</div>`).join('');
+  $('prep-body').innerHTML = prepHtml(c);
+  renderApproval();
+}
+
+// ---------- Copy & save ----------
+$('copy').addEventListener('click', async () => {
+  if (blockedByApproval()) return;
+  try { await navigator.clipboard.writeText(whatsappText(last)); toast('Quote copied — paste it into WhatsApp'); }
+  catch (err) { toast('Could not copy — select and copy manually'); }
+});
+
 let savedId = '';
 async function saveEnquiry() {
-  const s = readInputs();
-  if (!s.guests) { $('guests').focus(); toast('Enter the number of guests first'); return; }
+  const c = last;
+  if (!c.s.guests) { $('guests').focus(); toast('Enter the number of guests first'); return; }
   const missing = ['c-name', 'c-phone', 'c-staff'].find(id => !$(id).value.trim());
   if (missing) { $(missing).focus(); toast('Fill in the customer name, phone and your name'); return; }
+  if (blockedByApproval()) return;
 
   const btn = $('save');
   btn.disabled = true;
   btn.textContent = 'Saving…';
   const enquiry = {
     staff: $('c-staff').value.trim(), name: $('c-name').value.trim(), phone: $('c-phone').value.trim(),
-    email: $('c-email').value.trim(), eventDate: s.date, eventType: $('c-type').value,
-    fulfilment: $('c-fulfil').value, suburb: $('c-suburb').value.trim(),
-    guests: s.guests, veg: s.veg, appetite: APPETITE_LABEL[String(s.appetite)], biryani: BIRYANI_LABEL[s.biryani],
-    lines: last.lines, total: last.total, perGuest: last.perGuest, notes: $('c-notes').value.trim()
+    email: $('c-email').value.trim(), eventDate: c.s.date, eventTime: c.s.time ? fmtTime(c.s.time) : '',
+    eventType: $('c-type').value, fulfilment: c.s.fulfil, suburb: $('c-suburb').value.trim(),
+    guests: c.s.guests, veg: c.s.veg, kids: c.s.kids, biryani: BIRYANI_LABEL[c.s.biryani],
+    lines: c.lines.map(l => `${l.name} — ${l.detail}${l.included ? ' (included)' : ' = ' + money(l.amt)}`).join('\n'),
+    subtotal: c.subtotal, discountPct: c.pct, discount: c.discount, total: c.total, perGuest: c.perGuest,
+    managerPin: c.pct > DISCOUNT_LIMIT ? approval.managerPin : '',
+    notes: $('c-notes').value.trim()
   };
   try {
     const r = await callSheet({ action: 'save', pin, enquiry });
@@ -519,9 +719,10 @@ async function saveEnquiry() {
       return;
     }
     if (r.error === 'bad_pin' || r.error === 'locked') { lock(); $('pin-err').textContent = 'The PIN has changed. Type the new one, then save again.'; }
-    else toast('The spreadsheet rejected the enquiry. Use Copy estimate as a backup.');
+    else if (r.error === 'approval_required') { approval = { pct: 0, managerPin: '' }; update(); toast('Manager approval is needed again for this discount'); }
+    else toast(MGR_ERRORS[r.error] || 'The spreadsheet rejected the enquiry. Use Copy as a backup.');
   } catch (err) {
-    toast('Could not reach the spreadsheet. Use Copy estimate as a backup.');
+    toast('Could not reach the spreadsheet. Use Copy as a backup.');
   }
   btn.disabled = false;
   btn.textContent = 'Save enquiry to sheet';
@@ -529,13 +730,14 @@ async function saveEnquiry() {
 
 function newEnquiry() {
   if (!savedId && $('c-name').value.trim() && !confirm('This enquiry has not been saved. Start a new one anyway?')) return;
-  $('guests').value = 40; $('veg').value = 0; $('date').value = '';
-  document.querySelector('input[name=appetite][value="1"]').checked = true;
+  $('guests').value = 40;
+  ['veg', 'kids', 'disc'].forEach(id => { $(id).value = 0; });
+  ['date', 'time', 'c-name', 'c-phone', 'c-email', 'c-suburb', 'c-notes', 'mgr-pin'].forEach(id => { $(id).value = ''; });
   document.querySelector('input[name=biryani][value=chicken]').checked = true;
+  $('c-type').selectedIndex = 0; $('c-fulfil').selectedIndex = 0;
   for (const k in qty) qty[k] = 0;
   syncAddonInputs();
-  ['c-name', 'c-phone', 'c-email', 'c-suburb', 'c-notes'].forEach(id => { $(id).value = ''; });
-  $('c-type').selectedIndex = 0; $('c-fulfil').selectedIndex = 0;
+  approval = { pct: 0, managerPin: '' };
   savedId = '';
   $('saved').hidden = true;
   $('save').disabled = false;
@@ -545,26 +747,25 @@ function newEnquiry() {
 }
 
 // ---------- Events ----------
-['guests', 'veg', 'date'].forEach(id => $(id).addEventListener('input', update));
-document.querySelectorAll('input[name=appetite], input[name=biryani]').forEach(r => r.addEventListener('change', update));
+['guests', 'veg', 'kids', 'date', 'time', 'disc', 'c-fulfil', 'c-name'].forEach(id => $(id).addEventListener('input', update));
+document.querySelectorAll('input[name=biryani]').forEach(r => r.addEventListener('change', update));
 $('addons').addEventListener('click', e => {
   const b = e.target.closest('button[data-id]');
   if (!b) return;
-  qty[b.dataset.id] = Math.max(0, qty[b.dataset.id] + Number(b.dataset.d));
+  const a = ADDONS.find(x => x.id === b.dataset.id);
+  setQty(a, qty[a.id] + Number(b.dataset.d), true);
   syncAddonInputs();
   update();
 });
-$('addons').addEventListener('input', e => {
-  if (!e.target.dataset.id) return;
-  qty[e.target.dataset.id] = int(e.target.value);
+$('addons').addEventListener('change', e => {
+  const a = ADDONS.find(x => x.id === e.target.dataset.id);
+  if (!a) return;
+  setQty(a, e.target.value);
+  syncAddonInputs();
   update();
 });
 $('suggest').addEventListener('click', suggest);
 $('clear').addEventListener('click', () => { for (const k in qty) qty[k] = 0; syncAddonInputs(); update(); });
-$('copy').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText(last.text); toast('Estimate copied'); }
-  catch (err) { toast('Could not copy — select and copy manually'); }
-});
 $('save').addEventListener('click', saveEnquiry);
 $('new').addEventListener('click', newEnquiry);
 $('c-staff').value = store.get(localStorage, 'mm_staff_name');
