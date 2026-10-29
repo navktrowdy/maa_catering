@@ -288,7 +288,8 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
     <div class="saved" id="saved" hidden></div>
     <div class="actions">
       <button type="button" class="btn btn-solid" id="review">Review &amp; confirm order</button>
-      <button type="button" class="btn btn-solid" id="copy">Copy WhatsApp quote</button>
+      <button type="button" class="btn btn-solid" id="wa">Send on WhatsApp</button>
+      <button type="button" class="btn btn-ghost" id="copy">Copy quote</button>
       <button type="button" class="btn btn-ghost" id="save">Save enquiry to sheet</button>
       <button type="button" class="btn btn-ghost" id="new">Start new enquiry</button>
     </div>
@@ -810,6 +811,21 @@ $('copy').addEventListener('click', async () => {
   if (needsConfirm() || blockedByApproval()) return;
   try { await navigator.clipboard.writeText(whatsappText(last)); toast('Quote copied — paste it into WhatsApp'); }
   catch (err) { toast('Could not copy — select and copy manually'); }
+});
+
+// Australian numbers to WhatsApp's international form: 0412 345 678 / +61 412… → 61412345678
+function waNumber(raw) {
+  let d = String(raw).replace(/\D/g, '');
+  if (d.startsWith('0')) d = '61' + d.slice(1);
+  else if (/^4\d{8}$/.test(d)) d = '61' + d;
+  return /^61\d{9}$/.test(d) ? d : '';
+}
+
+$('wa').addEventListener('click', () => {
+  if (needsConfirm() || blockedByApproval()) return;
+  const num = waNumber($('c-phone').value);
+  if (!num) { $('c-phone').focus(); toast('Enter the customer\'s mobile number first'); return; }
+  window.open(`https://wa.me/${num}?text=${encodeURIComponent(whatsappText(last))}`, '_blank', 'noopener');
 });
 
 let savedId = '';
