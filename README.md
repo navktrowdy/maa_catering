@@ -33,7 +33,7 @@ request still needs the PIN. After 5 wrong PINs, checks pause for 10 minutes.
 - Staff can give up to 5% discount. Above that, a manager enters their PIN on the page to approve it; the sheet records the discount and **Manager approved: Yes**. The limit is `DISCOUNT_LIMIT` in both `index.html` and `Code.gs`.
 - **Copy WhatsApp quote** copies a plain-text quote with no per-item prices. The **Kitchen prep quantities** panel (meat, rice, starters, gravies, pre-order reminders) is for staff and is never copied.
 - Group pricing: base rates are for under 30 guests; food is 2% off for 30–39, 5% off for 40–49 and 10% off for 50+ (`GROUP_RATES`). Packaging is not reduced. This is separate from the staff discount.
-- Each item has an **On/Off** switch that removes it from the quote but keeps the quantity. Packaging and veg biryani have their own switches. **Other items** lets staff price anything not on the list.
-- Catering rates live in the `BIRYANI` and `ADDONS` lists near the top of the script in `index.html`. Prep assumptions (grams per head, 5% buffer, 4 L per gravy batch) are in `PREP`.
+- The menu runs Biryani, Starters, Desserts, Tiffin, then Gravies & sides and Drinks. Every item starts **Off**; adding a quantity switches it On, and switching an empty item On fills a starting quantity. Off keeps the quantity. Packaging has its own switch. **Other items** lets staff price anything not on the list.
+- Catering rates live in the `ADDONS` list near the top of the script in `index.html`. Prep assumptions (grams per head, 5% buffer, 4 L per gravy batch) are in `PREP`.
 - Change a PIN by editing it in Script properties. Staff are asked for the new one on their next save.
 - After editing `Code.gs`, use **Deploy > Manage deployments > Edit > New version** so the URL stays the same.
