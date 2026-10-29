@@ -199,8 +199,14 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
         <label class="field">Pickup or delivery
           <select id="c-fulfil">
             <option value="Pickup">Pickup from Portico Plaza</option>
-            <option value="Delivery">Delivery (to be confirmed)</option>
+            <option value="Delivery">Delivery</option>
           </select>
+        </label>
+        <label class="field" id="suburb-field" hidden>Delivery suburb
+          <input id="c-suburb" type="text" autocomplete="off">
+        </label>
+        <label class="field" id="fee-field" hidden>Delivery fee ($)
+          <input id="delfee" type="number" min="0" step="1" inputmode="decimal" value="55">
         </label>
       </div>
       <label class="check"><input type="checkbox" id="packing" checked> Include packaging</label>
@@ -244,9 +250,6 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
             <option>Community event</option>
             <option>Other</option>
           </select>
-        </label>
-        <label class="field">Delivery suburb
-          <input id="c-suburb" type="text">
         </label>
         <label class="field">Your name or initials <em>*</em>
           <input id="c-staff" type="text" maxlength="40" required>
@@ -328,6 +331,7 @@ const QUOTE_SIGNOFF = 'MaaMadurai Street Food\n0424 077 120';
 // ---------- Catering rates ----------
 const PAX_PER_BATCH = 30;                 // one gravy / raita / salna batch serves ~30
 const PACKAGING = { small: 25, large: 30, largeFrom: 30 };
+const DELIVERY_FEE = 55;                  // default; staff change it per suburb
 // Base rates are for up to 29 guests; bigger groups get a lower rate on food (not packaging).
 // Above 75 guests keeps the 50–75 rate.
 const GROUP_RATES = [{ from: 50, off: 10 }, { from: 40, off: 5 }, { from: 30, off: 2 }];
@@ -519,7 +523,11 @@ function blockedByApproval() {
 function readInputs() {
   const guests = int($('guests').value, 0);
   const veg = Math.min(int($('veg').value, 0), guests);
-  return { guests, veg, nonVeg: guests - veg, packing: $('packing').checked, date: $('date').value, time: $('time').value, fulfil: $('c-fulfil').value };
+  const fulfil = $('c-fulfil').value;
+  return {
+    guests, veg, nonVeg: guests - veg, packing: $('packing').checked, date: $('date').value, time: $('time').value, fulfil,
+    delivery: fulfil === 'Delivery', deliveryFee: Math.max(0, round2(Number($('delfee').value) || 0)), suburb: $('c-suburb').value.trim()
+  };
 }
 
 const paxWhere = test => ADDONS.filter(a => test(a) && active(a)).reduce((t, a) => t + qty[a.id], 0);
@@ -560,12 +568,20 @@ function compute() {
     lines.push({ group: 'Packaging', name: large ? 'Large packaging' : 'Standard packaging', detail: large ? `${PACKAGING.largeFrom}+ pax` : `under ${PACKAGING.largeFrom} pax`, amt: packaging, quote: 'Packaging' });
   }
 
-  const subtotal = round2(food - groupDiscount + packaging);
+  // Delivery is a flat fee, like packaging: not reduced by the group rate
+  let delivery = 0;
+  if (s.delivery && food > 0) {
+    delivery = s.deliveryFee;
+    const where = s.suburb ? `Delivery to ${s.suburb}` : 'Delivery';
+    lines.push({ group: 'Delivery', name: where, qtyText: s.suburb || 'Suburb not set', detail: s.suburb || 'Suburb not set', amt: delivery, quote: where });
+  }
+
+  const subtotal = round2(food - groupDiscount + packaging + delivery);
   const pct = discountPct();
   const discount = round2(subtotal * pct / 100);
   const total = round2(subtotal - discount);
   const perGuest = s.guests ? round2(total / s.guests) : 0;
-  return { s, chickenPax, muttonPax, biryaniPax, includedBatches, lines, food, groupPct, groupDiscount, packaging, subtotal, pct, discount, total, perGuest };
+  return { s, chickenPax, muttonPax, biryaniPax, includedBatches, lines, food, groupPct, groupDiscount, packaging, delivery, subtotal, pct, discount, total, perGuest };
 }
 
 function renderAddons() {
@@ -734,6 +750,7 @@ function update() {
     html += `<li${l.included ? ' class="incl"' : ''}><div>${l.name}<small>${shown ? l.detail : (l.qtyText || l.detail)}</small></div><span class="amt">${amt}</span></li>`;
   }
   $('lines').innerHTML = html || '<li class="empty" style="border:none">Switch items On in the menu to build the order.</li>';
+  $('suburb-field').hidden = $('fee-field').hidden = !c.s.delivery;
   $('price-box').hidden = !shown;
   $('price-locked').hidden = shown || !c.lines.length;
   $('review').hidden = shown || !c.lines.length;
@@ -744,6 +761,7 @@ function update() {
   if (c.groupPct) {
     sums.push(['Food', money(c.food)], [`Group rate, ${c.s.guests} guests (${c.groupPct}%)`, `−${money(c.groupDiscount)}`]);
     if (c.packaging) sums.push(['Packaging', money(c.packaging)]);
+    if (c.delivery) sums.push(['Delivery', money(c.delivery)]);
   }
   if (c.pct) sums.push(['Subtotal', money(c.subtotal)], [`Discount (${c.pct}%)`, `−${money(c.discount)}`]);
   $('sums').innerHTML = sums.map(([k, v]) => `<div><span>${k}</span><span>${v}</span></div>`).join('');
@@ -815,7 +833,7 @@ async function saveEnquiry() {
   const enquiry = {
     staff: $('c-staff').value.trim(), name: $('c-name').value.trim(), phone: $('c-phone').value.trim(),
     email: $('c-email').value.trim(), eventDate: c.s.date, eventTime: c.s.time ? fmtTime(c.s.time) : '',
-    eventType: $('c-type').value, fulfilment: c.s.fulfil, suburb: $('c-suburb').value.trim(),
+    eventType: $('c-type').value, fulfilment: c.s.fulfil, suburb: c.s.delivery ? c.s.suburb : '',
     guests: c.s.guests, veg: c.s.veg, kids: paxWhere(a => a.id === 'bmutk'),
     biryani: ADDONS.filter(a => a.biryani && active(a)).map(a => a.name).join(', ') || 'None',
     lines: c.lines.map(l => `${l.name} — ${l.detail}${l.included ? ' (included)' : ' = ' + money(l.amt)}`)
@@ -850,6 +868,7 @@ function newEnquiry() {
   ['veg', 'disc'].forEach(id => { $(id).value = 0; });
   ['date', 'time', 'c-name', 'c-phone', 'c-email', 'c-suburb', 'c-notes', 'mgr-pin'].forEach(id => { $(id).value = ''; });
   $('packing').checked = true;
+  $('delfee').value = DELIVERY_FEE;
   $('c-type').selectedIndex = 0; $('c-fulfil').selectedIndex = 0;
   for (const k in qty) { qty[k] = 0; on[k] = false; }
   renderAddons();
@@ -866,7 +885,7 @@ function newEnquiry() {
 }
 
 // ---------- Events ----------
-['guests', 'veg', 'date', 'time', 'disc', 'c-fulfil', 'c-name'].forEach(id => $(id).addEventListener('input', update));
+['guests', 'veg', 'date', 'time', 'disc', 'c-fulfil', 'c-suburb', 'delfee', 'c-name'].forEach(id => $(id).addEventListener('input', update));
 $('packing').addEventListener('change', update);
 $('addons').addEventListener('click', e => {
   const t = e.target.closest('[data-tog]');
