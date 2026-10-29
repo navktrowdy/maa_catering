@@ -320,9 +320,9 @@ const ADDONS = [
   { cat: 'Biryani', id: 'bmut',  name: 'Seeraga Samba Mutton Biryani',         price: 19, unit: 'pp', biryani: true, meat: 'mutton' },
   { cat: 'Biryani', id: 'bmutk', name: 'Seeraga Samba Mutton Biryani (child)', price: 12, unit: 'pp', biryani: true, meat: 'mutton', note: 'Children under 10' },
   { cat: 'Biryani', id: 'bveg',  name: 'Veg Biryani',                          price: 11, unit: 'pp', biryani: true, veg: true, suggest: s => s.veg },
-  { cat: 'Starters', id: 'c65b',  name: 'Chicken 65',             price: 75, unit: 'kg', kind: 'starter', meat: 'chicken', suggest: s => Math.ceil(s.nonVeg * PREP.starterKg) },
+  { cat: 'Starters', id: 'c65b',  name: 'Chicken 65',             price: 75, unit: 'kg', kind: 'starter', meat: 'chicken', suggest: s => Math.ceil(s.nonVeg * PREP.starterKg * 4) / 4 },
   { cat: 'Starters', id: 'c65l',  name: 'Chicken 65 (boneless)',  price: 8,  unit: 'pp', kind: 'starter', meat: 'chicken' },
-  { cat: 'Starters', id: 'gobi',  name: 'Gobi 65',                price: 45, unit: 'kg', kind: 'starter', veg: true, suggest: s => Math.ceil(s.veg * PREP.starterKg) },
+  { cat: 'Starters', id: 'gobi',  name: 'Gobi 65',                price: 45, unit: 'kg', kind: 'starter', veg: true, suggest: s => Math.ceil(s.veg * PREP.starterKg * 4) / 4 },
   { cat: 'Starters', id: 'pan65', name: 'Paneer 65',              price: 55, unit: 'kg', kind: 'starter', veg: true },
   { cat: 'Starters', id: 'kola',  name: 'Madurai Kola Urundai',   price: 8,  unit: 'serve', kind: 'starter', meat: 'mutton', each: 'per serve (3 pcs)' },
   { cat: 'Starters', id: 'pepch', name: 'Madurai Pepper Chicken', price: 60, unit: 'kg', kind: 'side', meat: 'chicken' },
@@ -356,11 +356,12 @@ const ADDONS = [
   { cat: 'Drinks', id: 'goli',  name: 'Goli Soda',           price: 5.99,  unit: 'ea', veg: true },
   { cat: 'Drinks', id: 'water', name: 'Bottled Water',       price: 2.99,  unit: 'ea', veg: true }
 ];
+// step: what − / + changes by; units with a step under 1 also take typed amounts to 2 decimals
 const UNIT = {
   pp:    { each: 'per head',  qty: n => `${n} pax` },
   ea:    { each: 'each',      qty: n => `${n} pcs` },
-  kg:    { each: 'per kg',    qty: n => `${n} kg` },
-  L:     { each: 'per litre', qty: n => `${n} L` },
+  kg:    { each: 'per kg',    qty: n => `${n} kg`, step: 0.25 },
+  L:     { each: 'per litre', qty: n => `${n} L`,  step: 0.5 },
   serve: { each: 'per serve', qty: n => `${n} serve${n === 1 ? '' : 's'}` },
   batch: { each: 'per batch', qty: n => `${n} batch${n === 1 ? '' : 'es'}` }
 };
@@ -517,7 +518,7 @@ function compute() {
   }
 
   for (const x of custom) {
-    const name = x.name.trim(), q = int(x.qty), p = Math.max(0, Number(x.price) || 0);
+    const name = x.name.trim(), q = Math.max(0, round2(Number(x.qty) || 0)), p = Math.max(0, Number(x.price) || 0);
     if (!name || !q) continue;
     lines.push({ group: 'Other items', name, detail: `${q} × ${money(p)}`, amt: round2(q * p), quote: `${name} — ${q}` });
   }
@@ -554,18 +555,21 @@ function renderAddons() {
       <div class="addon-ctl">
       <button type="button" class="tog" data-tog="${a.id}" aria-pressed="${on[a.id]}" aria-label="${a.name} on or off">${on[a.id] ? 'On' : 'Off'}</button>
       <div class="stepper">
-        <button type="button" data-id="${a.id}" data-d="-1" aria-label="One less ${a.name}">−</button>
-        <input type="number" min="0" inputmode="numeric" data-id="${a.id}" value="${qty[a.id]}" aria-label="${a.name} quantity">
-        <button type="button" data-id="${a.id}" data-d="1" aria-label="One more ${a.name}">+</button>
+        <button type="button" data-id="${a.id}" data-d="-${stepOf(a)}" aria-label="Less ${a.name}">−</button>
+        <input type="number" min="0" step="${decimal(a) ? '0.01' : '1'}" inputmode="${decimal(a) ? 'decimal' : 'numeric'}" data-id="${a.id}" value="${qty[a.id]}" aria-label="${a.name} quantity">
+        <button type="button" data-id="${a.id}" data-d="${stepOf(a)}" aria-label="More ${a.name}">+</button>
       </div></div></div>`;
   }
   $('addons').innerHTML = html;
 }
 
+const stepOf = a => UNIT[a.unit].step || 1;
+const decimal = a => stepOf(a) < 1;
+
 // Items with a minimum jump straight to it; stepping down from it drops to 0.
 // Adding a quantity switches the item On; going to 0 switches it Off.
 function setQty(a, n, stepping) {
-  n = int(n);
+  n = decimal(a) ? Math.max(0, round2(Number(n) || 0)) : int(n);
   if (a.min && n > 0 && n < a.min) n = stepping && n < qty[a.id] ? 0 : a.min;
   if (n > 0 && !qty[a.id]) on[a.id] = true;
   if (n === 0) on[a.id] = false;
@@ -590,7 +594,7 @@ const esc = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;'
 function renderCustom() {
   $('custom').innerHTML = custom.map((x, i) => `<div class="custom-row">
     <input class="name" type="text" data-i="${i}" data-f="name" value="${esc(x.name)}" placeholder="e.g. Sambar (litres)" aria-label="Item name">
-    <input type="number" min="0" inputmode="numeric" data-i="${i}" data-f="qty" value="${esc(x.qty)}" placeholder="Qty" aria-label="Quantity">
+    <input type="number" min="0" step="0.01" inputmode="decimal" data-i="${i}" data-f="qty" value="${esc(x.qty)}" placeholder="Qty" aria-label="Quantity">
     <input type="number" min="0" step="0.01" inputmode="decimal" data-i="${i}" data-f="price" value="${esc(x.price)}" placeholder="$ each" aria-label="Price each">
     <button type="button" class="rm" data-rm="${i}" aria-label="Remove item">×</button></div>`).join('');
 }
