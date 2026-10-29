@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catering Calculator | MaaMadurai Staff</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+/* Tokens mirror the MaaMadurai design system (tokens/colors.css, typography.css) */
+:root {
+  --background: #7d1d0d;
+  --background-elevated: #8f2410;
+  --background-card: #a02a13;
+  --foreground: #ffffff;
+  --foreground-muted: #f5f0e8;
+  --accent-primary: #face0b;
+  --accent-hover: #fbd84d;
+  --border-subtle: rgba(250, 206, 11, 0.2);
+  --border-medium: rgba(250, 206, 11, 0.3);
+  --tag-veg: #22c55e;
+  --font-display: 'Cinzel', Georgia, 'Times New Roman', serif;
+  --font-body: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-body); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1.2; margin: 0; }
+a { color: var(--accent-primary); text-decoration: none; }
+a:hover { color: var(--accent-hover); }
+button { font-family: inherit; }
+
+/* PIN lock */
+.lock { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
+.lock-card { width: 100%; max-width: 380px; background: var(--background-elevated); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 36px 28px; text-align: center; display: flex; flex-direction: column; gap: 16px; }
+.lock-card h1 { font-size: 26px; font-variant: small-caps; }
+.lock-card input { text-align: center; font-size: 26px; letter-spacing: 0.4em; }
+.lock-err { color: #ffb38a; font-size: 14px; margin: 0; min-height: 1.6em; }
+
+.hero { position: relative; text-align: center; padding: 48px 16px 28px; max-width: 860px; margin: 0 auto; }
+.eyebrow { font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent-primary); }
+.hero h1 { font-size: clamp(28px, 4.4vw, 48px); font-variant: small-caps; margin: 10px 0 14px; }
+.hero p { color: var(--foreground-muted); font-size: 17px; margin: 0; text-wrap: pretty; }
+.rule { width: 96px; height: 4px; background: var(--accent-primary); margin: 22px auto 0; }
+.lock-btn { position: absolute; top: 16px; right: 16px; }
+
+.layout { max-width: 1280px; margin: 0 auto; padding: 8px 16px 56px; display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 28px; align-items: start; }
+@media (max-width: 960px) { .layout { grid-template-columns: 1fr; } }
+
+.panel { background: var(--background-elevated); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 32px; }
+@media (max-width: 600px) { .panel { padding: 22px 18px; } }
+.panel + .panel { margin-top: 24px; }
+.step-head { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+.step-num { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 999px; background: var(--accent-primary); color: var(--background); font-weight: 700; }
+.step-head h2 { font-size: 22px; }
+
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; }
+.fields .wide { grid-column: 1 / -1; }
+label.field { display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--foreground-muted); }
+label.field em { font-style: normal; color: var(--accent-primary); }
+input[type=number], input[type=date], input[type=text], input[type=tel], input[type=email], input[type=password], select, textarea { width: 100%; padding: 14px 16px; border-radius: 10px; border: 1px solid var(--border-subtle); background: rgba(0,0,0,0.28); color: var(--foreground); font-family: var(--font-body); font-size: 16px; min-height: 52px; color-scheme: dark; }
+select option { background: var(--background-elevated); }
+textarea { min-height: 100px; resize: vertical; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+.hint { font-size: 13px; color: rgba(245,240,232,0.7); margin: 0; }
+
+.choice-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.choice { position: relative; display: block; cursor: pointer; }
+.choice input { position: absolute; opacity: 0; pointer-events: none; }
+.choice span { display: flex; flex-direction: column; gap: 2px; height: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--border-subtle); background: var(--background-card); transition: border-color .2s, background .2s; }
+.choice span b { font-weight: 600; font-size: 15px; }
+.choice span small { color: rgba(245,240,232,0.75); font-size: 12.5px; }
+.choice input:checked + span { border: 2px solid var(--accent-primary); padding: 13px 15px; background: rgba(250,206,11,0.1); }
+.choice input:focus-visible + span { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+.sub-label { font-size: 14px; color: var(--foreground-muted); margin: 22px 0 10px; }
+
+.addon-tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: 12px 22px; border-radius: 999px; font-weight: 600; font-size: 15px; cursor: pointer; min-height: 46px; border: 1px solid var(--accent-primary); transition: background .2s, color .2s; }
+.btn-solid { background: var(--accent-primary); color: var(--background); }
+.btn-solid:hover { background: var(--accent-hover); color: var(--background); }
+.btn-ghost { background: transparent; color: var(--accent-primary); }
+.btn-ghost:hover { background: var(--accent-primary); color: var(--background); }
+.btn:disabled { opacity: 0.55; cursor: default; }
+.btn-link { background: none; border: none; color: var(--foreground-muted); text-decoration: underline; cursor: pointer; font-size: 14px; padding: 8px 0; }
+
+.addon-cat { font-family: var(--font-display); font-size: 17px; color: var(--accent-primary); margin: 24px 0 6px; }
+.addon { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-subtle); }
+.addon:last-child { border-bottom: none; }
+.addon-name { font-weight: 500; }
+.addon-meta { font-size: 13px; color: rgba(245,240,232,0.72); }
+.tag-veg { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .06em; color: var(--tag-veg); border: 1px solid var(--tag-veg); border-radius: 6px; padding: 0 5px; margin-left: 6px; vertical-align: 2px; }
+.stepper { display: inline-flex; align-items: center; border: 1px solid var(--border-medium); border-radius: 999px; overflow: hidden; background: rgba(0,0,0,0.2); }
+.stepper button { width: 40px; height: 40px; border: none; background: transparent; color: var(--accent-primary); font-size: 20px; cursor: pointer; }
+.stepper button:hover { background: rgba(250,206,11,0.15); }
+.stepper input { width: 48px; min-height: 0; height: 40px; padding: 0; text-align: center; border: none; border-radius: 0; background: transparent; -moz-appearance: textfield; }
+.stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* Summary */
+.summary { position: sticky; top: 20px; }
+@media (max-width: 960px) { .summary { position: static; } }
+.summary h2 { font-size: 22px; margin-bottom: 4px; }
+.summary .for { color: var(--foreground-muted); font-size: 14px; margin: 0 0 18px; }
+.lines { list-style: none; margin: 0; padding: 0; }
+.lines li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--border-subtle); font-size: 14.5px; }
+.lines li .qty { color: var(--accent-primary); font-weight: 600; margin-right: 6px; }
+.lines li small { display: block; color: rgba(245,240,232,0.7); font-size: 12.5px; }
+.lines li .amt { font-weight: 600; white-space: nowrap; }
+.lines .group { border-bottom: none; padding: 16px 0 2px; font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent-primary); }
+.empty { color: rgba(245,240,232,0.7); font-size: 14px; }
+.total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 18px; padding-top: 16px; border-top: 2px solid var(--accent-primary); }
+.total span:first-child { font-family: var(--font-display); font-size: 18px; }
+.total .big { font-size: 34px; font-weight: 700; color: var(--accent-primary); }
+.per-head { text-align: right; color: var(--foreground-muted); font-size: 14px; margin: 2px 0 0; }
+.coverage { margin-top: 18px; background: var(--background-card); border-radius: 12px; padding: 14px 16px; font-size: 13.5px; color: var(--foreground-muted); }
+.coverage b { color: var(--foreground); }
+.notice { margin-top: 14px; border-radius: 12px; padding: 12px 16px; font-size: 13.5px; background: rgba(232,106,36,0.16); border: 1px solid #e86a24; }
+.saved { margin-top: 14px; border-radius: 12px; padding: 12px 16px; font-size: 13.5px; background: rgba(34,197,94,0.14); border: 1px solid var(--tag-veg); }
+.saved b { color: var(--accent-primary); }
+.actions { display: grid; gap: 10px; margin-top: 20px; }
+.actions .btn { width: 100%; }
+.fine { font-size: 12.5px; color: rgba(245,240,232,0.62); margin: 16px 0 0; line-height: 1.7; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); opacity: 0; background: var(--accent-primary); color: var(--background); padding: 12px 22px; border-radius: 999px; font-weight: 600; transition: opacity .25s, transform .25s; pointer-events: none; max-width: calc(100% - 32px); text-align: center; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="lock" id="lock">
+  <form class="lock-card" id="lock-form">
+    <span class="eyebrow">MaaMadurai · Staff only</span>
+    <h1>Catering Calculator</h1>
+    <label class="field">Staff PIN
+      <input id="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="8" required>
+    </label>
+    <p class="lock-err" id="pin-err" role="alert"></p>
+    <button type="submit" class="btn btn-solid" id="unlock">Unlock</button>
+  </form>
+</div>
+
+<div id="app" hidden>
+<header class="hero">
+  <button type="button" class="btn btn-ghost lock-btn" id="lock-now">Lock</button>
+  <span class="eyebrow">MaaMadurai · Front of house</span>
+  <h1>Catering Calculator</h1>
+  <p>Size the buckets, starters and sides for a customer's function, quote the estimate, and log the enquiry to the spreadsheet.</p>
+  <div class="rule"></div>
+</header>
+
+<main class="layout">
+  <div>
+    <section class="panel" aria-labelledby="s1">
+      <div class="step-head"><span class="step-num">1</span><h2 id="s1">Guests</h2></div>
+      <div class="fields">
+        <label class="field">Total guests
+          <input id="guests" type="number" min="1" max="2000" step="1" inputmode="numeric" value="40">
+        </label>
+        <label class="field">Of those, vegetarian
+          <input id="veg" type="number" min="0" step="1" inputmode="numeric" value="0">
+        </label>
+        <label class="field">Event date
+          <input id="date" type="date">
+        </label>
+      </div>
+      <p class="sub-label">How hungry is the crowd?</p>
+      <div class="choice-group" role="radiogroup" aria-label="Appetite">
+        <label class="choice"><input type="radio" name="appetite" value="0.85"><span><b>Light</b><small>Lunch, lots of other food</small></span></label>
+        <label class="choice"><input type="radio" name="appetite" value="1" checked><span><b>Regular</b><small>Biryani is the main meal</small></span></label>
+        <label class="choice"><input type="radio" name="appetite" value="1.2"><span><b>Hearty</b><small>Big eaters, seconds expected</small></span></label>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="s2">
+      <div class="step-head"><span class="step-num">2</span><h2 id="s2">Biryani</h2></div>
+      <div class="choice-group" role="radiogroup" aria-label="Biryani">
+        <label class="choice"><input type="radio" name="biryani" value="chicken" checked><span><b>Madurai Chicken</b><small>Half $105 · Full $200</small></span></label>
+        <label class="choice"><input type="radio" name="biryani" value="mutton"><span><b>Seeraga Samba Mutton</b><small>Half $120 · Full $230</small></span></label>
+        <label class="choice"><input type="radio" name="biryani" value="mix"><span><b>Both, half-and-half</b><small>Split guests across the two</small></span></label>
+      </div>
+      <p class="hint" style="margin-top:14px">A half bucket feeds around 20 guests, a full bucket around 45. Every bucket comes with gravy and raita. Vegetarian guests get Vegetable Biryani by the plate.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="s3">
+      <div class="step-head"><span class="step-num">3</span><h2 id="s3">Add to the spread</h2></div>
+      <div class="addon-tools">
+        <p class="hint" style="max-width:420px">Priced per plate from the regular menu. Suggest quantities for the headcount, then adjust with the customer.</p>
+        <div style="display:flex; gap:10px; align-items:center">
+          <button type="button" class="btn btn-solid" id="suggest">Suggest for headcount</button>
+          <button type="button" class="btn-link" id="clear">Clear</button>
+        </div>
+      </div>
+      <div id="addons"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="s4">
+      <div class="step-head"><span class="step-num">4</span><h2 id="s4">Customer &amp; event</h2></div>
+      <form class="fields" id="customer" autocomplete="off" onsubmit="return false">
+        <label class="field">Customer name <em>*</em>
+          <input id="c-name" type="text" required>
+        </label>
+        <label class="field">Phone <em>*</em>
+          <input id="c-phone" type="tel" inputmode="tel" placeholder="04__ ___ ___" required>
+        </label>
+        <label class="field">Email
+          <input id="c-email" type="email">
+        </label>
+        <label class="field">Event type
+          <select id="c-type">
+            <option>Birthday party</option>
+            <option>House-warming</option>
+            <option>Corporate lunch</option>
+            <option>Temple or cultural function</option>
+            <option>Wedding or reception</option>
+            <option>Community event</option>
+            <option>Other</option>
+          </select>
+        </label>
+        <label class="field">Pickup or delivery
+          <select id="c-fulfil">
+            <option>Pickup from Portico Plaza</option>
+            <option>Delivery (to be confirmed)</option>
+          </select>
+        </label>
+        <label class="field">Delivery suburb
+          <input id="c-suburb" type="text">
+        </label>
+        <label class="field">Your name or initials <em>*</em>
+          <input id="c-staff" type="text" maxlength="40" required>
+        </label>
+        <label class="field wide">Notes
+          <textarea id="c-notes" placeholder="Serving time, allergies, spice level, how they heard about us…"></textarea>
+        </label>
+      </form>
+    </section>
+  </div>
+
+  <aside class="panel summary" aria-labelledby="sum-h" aria-live="polite">
+    <h2 id="sum-h">Estimate</h2>
+    <p class="for" id="for"></p>
+    <ul class="lines" id="lines"></ul>
+    <div class="total"><span>Estimated total</span><span class="big" id="total">$0</span></div>
+    <p class="per-head" id="perhead"></p>
+    <div class="coverage" id="coverage"></div>
+    <div class="notice" id="notice" hidden></div>
+    <div class="saved" id="saved" hidden></div>
+    <div class="actions">
+      <button type="button" class="btn btn-solid" id="save">Save enquiry to sheet</button>
+      <button type="button" class="btn btn-ghost" id="copy">Copy estimate</button>
+      <button type="button" class="btn btn-ghost" id="new">Start new enquiry</button>
+    </div>
+    <p class="fine">Quote this to the customer as an estimate at in-store prices (AUD, updated 12 September 2026). Final quantities and price are confirmed when they order. Delivery is by arrangement. Chicken and mutton are halal; one kitchen, so no allergen-free guarantee.</p>
+  </aside>
+</main>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+// Paste the Apps Script web app URL here after deploying it (see SETUP.md)
+const ENQUIRY_ENDPOINT = '';
+const IDLE_LOCK_MS = 20 * 60 * 1000;
+
+// Prices from Menu.dc.html / Catering.dc.html (in-store, updated 12 Sep 2026)
+const BUCKETS = {
+  chicken: { name: 'Madurai Chicken Biryani', half: 105, full: 200 },
+  mutton:  { name: 'Seeraga Samba Mutton Biryani', half: 120, full: 230 }
+};
+const HALF_SERVES = 20, FULL_SERVES = 45;
+const VEG_BIRYANI = { name: 'Vegetable Biryani', price: 13.99 };
+
+// per: suggested plates per N guests of the given audience (all / nonveg / veg)
+const ADDONS = [
+  { cat: 'Starters', id: 'c65',    name: 'Chicken 65',                  price: 13.99, per: 6, aud: 'nonveg' },
+  { cat: 'Starters', id: 'kola',   name: 'Madurai Kola Urundai (3 pcs)', price: 11.99, per: 6, aud: 'nonveg' },
+  { cat: 'Dry sides', id: 'pepch', name: 'Madurai Pepper Chicken',      price: 13.99, per: 8, aud: 'nonveg' },
+  { cat: 'Dry sides', id: 'chuk',  name: 'Madurai Mutton Chukka',       price: 15.99, per: 0, aud: 'nonveg' },
+  { cat: 'Parotta & gravy', id: 'par',  name: 'Plain Parotta (2 pcs)',  price: 6.99,  per: 4, aud: 'all', veg: true },
+  { cat: 'Parotta & gravy', id: 'cgr',  name: 'Chicken Gravy',          price: 6.99,  per: 0, aud: 'nonveg' },
+  { cat: 'Parotta & gravy', id: 'vgr',  name: 'Veg Gravy',              price: 5.99,  per: 4, aud: 'veg', veg: true },
+  { cat: 'Drinks & dessert', id: 'jig',  name: 'Madurai Jigarthanda',   price: 12.99, per: 0, veg: true },
+  { cat: 'Drinks & dessert', id: 'rose', name: 'Rose Milk',             price: 5.99,  per: 0, veg: true },
+  { cat: 'Drinks & dessert', id: 'lassi',name: 'Mango Lassi',           price: 5.99,  per: 0, veg: true },
+  { cat: 'Drinks & dessert', id: 'cof',  name: 'Filter Coffee',         price: 4.99,  per: 0, veg: true },
+  { cat: 'Drinks & dessert', id: 'tea',  name: 'Masala Tea',            price: 4.99,  per: 0, veg: true },
+  { cat: 'Drinks & dessert', id: 'goli', name: 'Goli Soda',             price: 5.99,  per: 0, veg: true },
+  { cat: 'Drinks & dessert', id: 'water',name: 'Bottled Water',         price: 2.99,  per: 0, veg: true }
+];
+const qty = Object.fromEntries(ADDONS.map(a => [a.id, 0]));
+
+const $ = id => document.getElementById(id);
+const money = n => n.toLocaleString('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
+const int = (v, min = 0) => Math.max(min, Math.floor(Number(v) || 0));
+const store = {
+  get: (s, k) => { try { return s.getItem(k) || ''; } catch (e) { return ''; } },
+  set: (s, k, v) => { try { v ? s.setItem(k, v) : s.removeItem(k); } catch (e) {} }
+};
+
+function toast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ---------- Staff PIN (checked by the Apps Script, not in this page) ----------
+const PIN_ERRORS = {
+  bad_pin: 'That PIN is not right.',
+  locked: 'Too many wrong tries. Wait 10 minutes and try again.',
+  pin_not_set: 'No staff PIN is set yet. Use Catering > Set staff PIN in the spreadsheet.'
+};
+let pin = store.get(sessionStorage, 'mm_staff_pin');
+
+async function callSheet(payload) {
+  // text/plain keeps this a "simple" request, so Apps Script needs no CORS preflight
+  const res = await fetch(ENQUIRY_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) });
+  return res.json();
+}
+
+function showApp(on) {
+  $('app').hidden = !on;
+  $('lock').hidden = on;
+  if (!on) { $('pin').value = ''; $('pin').focus(); }
+}
+
+function lock() {
+  pin = '';
+  store.set(sessionStorage, 'mm_staff_pin', '');
+  showApp(false);
+}
+
+$('lock-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const entered = $('pin').value.trim();
+  if (!ENQUIRY_ENDPOINT) { $('pin-err').textContent = 'The spreadsheet is not connected yet. Add the web app URL to this page (see SETUP.md).'; return; }
+  $('unlock').disabled = true;
+  $('pin-err').textContent = '';
+  try {
+    const r = await callSheet({ action: 'verify', pin: entered });
+    if (r.ok) {
+      pin = entered;
+      store.set(sessionStorage, 'mm_staff_pin', pin);
+      showApp(true);
+      resetIdle();
+    } else {
+      $('pin-err').textContent = PIN_ERRORS[r.error] || 'Could not check the PIN.';
+      $('pin').select();
+    }
+  } catch (err) {
+    $('pin-err').textContent = 'Could not reach the spreadsheet. Check the internet connection.';
+  }
+  $('unlock').disabled = false;
+});
+$('lock-now').addEventListener('click', lock);
+
+let idleTimer;
+function resetIdle() {
+  clearTimeout(idleTimer);
+  if (pin) idleTimer = setTimeout(lock, IDLE_LOCK_MS);
+}
+['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, resetIdle, { passive: true }));
+
+// ---------- Calculator ----------
+// Cheapest mix of full/half buckets that serves at least `n` guests.
+// Ties go to the plan with fewer leftover servings.
+function bucketPlan(n, b) {
+  if (n <= 0) return { full: 0, half: 0, cost: 0, serves: 0 };
+  let best = null;
+  for (let full = 0; full <= Math.ceil(n / FULL_SERVES); full++) {
+    const half = Math.ceil(Math.max(0, n - full * FULL_SERVES) / HALF_SERVES);
+    const cost = full * b.full + half * b.half;
+    const serves = full * FULL_SERVES + half * HALF_SERVES;
+    if (!best || cost < best.cost || (cost === best.cost && serves < best.serves)) best = { full, half, cost, serves };
+  }
+  return best;
+}
+
+function readInputs() {
+  const guests = int($('guests').value, 0);
+  const veg = Math.min(int($('veg').value, 0), guests);
+  const appetite = Number(document.querySelector('input[name=appetite]:checked').value);
+  const biryani = document.querySelector('input[name=biryani]:checked').value;
+  return { guests, veg, nonVeg: guests - veg, appetite, biryani, date: $('date').value };
+}
+
+function renderAddons() {
+  let html = '', cat = '';
+  for (const a of ADDONS) {
+    if (a.cat !== cat) { cat = a.cat; html += `<h3 class="addon-cat">${cat}</h3>`; }
+    html += `<div class="addon">
+      <div><div class="addon-name">${a.name}${a.veg ? '<span class="tag-veg">VEG</span>' : ''}</div><div class="addon-meta">${money(a.price)} each</div></div>
+      <div class="stepper">
+        <button type="button" data-id="${a.id}" data-d="-1" aria-label="One less ${a.name}">−</button>
+        <input type="number" min="0" inputmode="numeric" data-id="${a.id}" value="${qty[a.id]}" aria-label="${a.name} quantity">
+        <button type="button" data-id="${a.id}" data-d="1" aria-label="One more ${a.name}">+</button>
+      </div></div>`;
+  }
+  $('addons').innerHTML = html;
+}
+
+function suggest() {
+  const { guests, veg, nonVeg, appetite } = readInputs();
+  const pool = { all: guests, nonveg: nonVeg, veg };
+  for (const a of ADDONS) qty[a.id] = a.per ? Math.ceil(pool[a.aud] * appetite / a.per) : 0;
+  syncAddonInputs();
+  update();
+}
+
+function syncAddonInputs() {
+  document.querySelectorAll('#addons input').forEach(i => { i.value = qty[i.dataset.id]; });
+}
+
+function noticeFor(date) {
+  if (!date) return '';
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const ev = new Date(date + 'T00:00:00');
+  const days = Math.round((ev - today) / 86400000);
+  if (days < 0) return 'That date has already passed — check the event date.';
+  if (days < 2) return 'Short notice: check with the kitchen before confirming this date.';
+  const weekend = ev.getDay() === 0 || ev.getDay() === 6;
+  if (weekend && days < 7) return 'Weekend function under a week away: check kitchen capacity before confirming.';
+  return '';
+}
+
+const APPETITE_LABEL = { '0.85': 'Light', '1': 'Regular', '1.2': 'Hearty' };
+const BIRYANI_LABEL = { chicken: 'Chicken', mutton: 'Mutton', mix: 'Chicken + Mutton' };
+let last = { text: '', lines: '', total: 0, perGuest: 0 };
+
+function update() {
+  const s = readInputs();
+  const text = [];
+
+  // Biryani
+  const eaters = Math.ceil(s.nonVeg * s.appetite);
+  const kinds = s.biryani === 'mix' ? ['chicken', 'mutton'] : [s.biryani];
+  const split = s.biryani === 'mix' ? [Math.ceil(eaters / 2), Math.floor(eaters / 2)] : [eaters];
+  let bucketServes = 0;
+  const biryaniLines = [];
+  kinds.forEach((k, i) => {
+    const b = BUCKETS[k], p = bucketPlan(split[i], b);
+    bucketServes += p.serves;
+    if (p.full) biryaniLines.push({ q: p.full, name: `Full bucket — ${b.name}`, note: `serves ~${FULL_SERVES} each`, amt: p.full * b.full });
+    if (p.half) biryaniLines.push({ q: p.half, name: `Half bucket — ${b.name}`, note: `serves ~${HALF_SERVES} each`, amt: p.half * b.half });
+  });
+  const vegPlates = Math.ceil(s.veg * s.appetite);
+  if (vegPlates) biryaniLines.push({ q: vegPlates, name: VEG_BIRYANI.name, note: `${money(VEG_BIRYANI.price)} per plate`, amt: vegPlates * VEG_BIRYANI.price });
+
+  const addonLines = ADDONS.filter(a => qty[a.id] > 0).map(a => ({ q: qty[a.id], name: a.name, note: `${money(a.price)} each`, amt: qty[a.id] * a.price }));
+
+  let total = 0, html = '';
+  const items = [];
+  const group = (title, arr) => {
+    if (!arr.length) return;
+    html += `<li class="group">${title}</li>`;
+    text.push('', title.toUpperCase());
+    for (const l of arr) {
+      total += l.amt;
+      html += `<li><div><span class="qty">${l.q}×</span>${l.name}<small>${l.note}</small></div><span class="amt">${money(l.amt)}</span></li>`;
+      text.push(`${l.q} x ${l.name} — ${money(l.amt)}`);
+      items.push(`${l.q} x ${l.name} — ${money(l.amt)}`);
+    }
+  };
+  group('Biryani', biryaniLines);
+  group('Add-ons', addonLines);
+  $('lines').innerHTML = html || '<li class="empty" style="border:none">Enter the headcount to see an estimate.</li>';
+  total = Math.round(total * 100) / 100;
+  const perGuest = s.guests ? Math.round(total / s.guests * 100) / 100 : 0;
+  $('total').textContent = money(total);
+  $('perhead').textContent = s.guests ? `about ${money(perGuest)} per guest` : '';
+
+  $('for').textContent = s.guests ? `${s.guests} guests${s.veg ? ` · ${s.veg} vegetarian` : ''} · ${APPETITE_LABEL[String(s.appetite)].toLowerCase()} appetite` : '';
+
+  let cov = '';
+  if (s.nonVeg) {
+    const spare = bucketServes - s.nonVeg;
+    cov = `Buckets serve about <b>${bucketServes}</b> for <b>${s.nonVeg}</b> non-veg guests`;
+    cov += spare > 0 ? ` — roughly ${spare} extra serves for seconds.` : '.';
+    if (s.biryani === 'mix') cov += ' Guests are split evenly between chicken and mutton.';
+  } else if (s.guests) {
+    cov = 'All-vegetarian function — check bulk vegetable biryani pricing with the kitchen.';
+  }
+  $('coverage').innerHTML = cov;
+  $('coverage').hidden = !cov;
+
+  const n = noticeFor(s.date);
+  $('notice').textContent = n;
+  $('notice').hidden = !n;
+
+  last = {
+    total, perGuest, lines: items.join('\n'),
+    text: [
+      'MaaMadurai catering estimate',
+      `${$('for').textContent}${s.date ? ` · event ${s.date}` : ''}`,
+      ...text,
+      '',
+      `Estimated total: ${money(total)}${s.guests ? ` (${$('perhead').textContent})` : ''}`,
+      'In-store prices, to be confirmed when ordering. Call 0424 077 120.'
+    ].join('\n')
+  };
+}
+
+// ---------- Save to spreadsheet ----------
+let savedId = '';
+async function saveEnquiry() {
+  const s = readInputs();
+  if (!s.guests) { $('guests').focus(); toast('Enter the number of guests first'); return; }
+  const missing = ['c-name', 'c-phone', 'c-staff'].find(id => !$(id).value.trim());
+  if (missing) { $(missing).focus(); toast('Fill in the customer name, phone and your name'); return; }
+
+  const btn = $('save');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  const enquiry = {
+    staff: $('c-staff').value.trim(), name: $('c-name').value.trim(), phone: $('c-phone').value.trim(),
+    email: $('c-email').value.trim(), eventDate: s.date, eventType: $('c-type').value,
+    fulfilment: $('c-fulfil').value, suburb: $('c-suburb').value.trim(),
+    guests: s.guests, veg: s.veg, appetite: APPETITE_LABEL[String(s.appetite)], biryani: BIRYANI_LABEL[s.biryani],
+    lines: last.lines, total: last.total, perGuest: last.perGuest, notes: $('c-notes').value.trim()
+  };
+  try {
+    const r = await callSheet({ action: 'save', pin, enquiry });
+    if (r.ok) {
+      savedId = r.id;
+      $('saved').innerHTML = `Saved to the sheet as <b>${r.id}</b>. Later changes are not saved — edit the row in the sheet, or start a new enquiry.`;
+      $('saved').hidden = false;
+      btn.textContent = `Saved ✓ ${r.id}`;
+      toast(`Enquiry saved as ${r.id}`);
+      return;
+    }
+    if (r.error === 'bad_pin' || r.error === 'locked') { toast('The staff PIN has changed — unlock again'); lock(); }
+    else toast('The spreadsheet rejected the enquiry. Use Copy estimate as a backup.');
+  } catch (err) {
+    toast('Could not reach the spreadsheet. Use Copy estimate as a backup.');
+  }
+  btn.disabled = false;
+  btn.textContent = 'Save enquiry to sheet';
+}
+
+function newEnquiry() {
+  if (!savedId && $('c-name').value.trim() && !confirm('This enquiry has not been saved. Start a new one anyway?')) return;
+  $('guests').value = 40; $('veg').value = 0; $('date').value = '';
+  document.querySelector('input[name=appetite][value="1"]').checked = true;
+  document.querySelector('input[name=biryani][value=chicken]').checked = true;
+  for (const k in qty) qty[k] = 0;
+  syncAddonInputs();
+  ['c-name', 'c-phone', 'c-email', 'c-suburb', 'c-notes'].forEach(id => { $(id).value = ''; });
+  $('c-type').selectedIndex = 0; $('c-fulfil').selectedIndex = 0;
+  savedId = '';
+  $('saved').hidden = true;
+  $('save').disabled = false;
+  $('save').textContent = 'Save enquiry to sheet';
+  update();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ---------- Events ----------
+['guests', 'veg', 'date'].forEach(id => $(id).addEventListener('input', update));
+document.querySelectorAll('input[name=appetite], input[name=biryani]').forEach(r => r.addEventListener('change', update));
+$('addons').addEventListener('click', e => {
+  const b = e.target.closest('button[data-id]');
+  if (!b) return;
+  qty[b.dataset.id] = Math.max(0, qty[b.dataset.id] + Number(b.dataset.d));
+  syncAddonInputs();
+  update();
+});
+$('addons').addEventListener('input', e => {
+  if (!e.target.dataset.id) return;
+  qty[e.target.dataset.id] = int(e.target.value);
+  update();
+});
+$('suggest').addEventListener('click', suggest);
+$('clear').addEventListener('click', () => { for (const k in qty) qty[k] = 0; syncAddonInputs(); update(); });
+$('copy').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(last.text); toast('Estimate copied'); }
+  catch (err) { toast('Could not copy — select and copy manually'); }
+});
+$('save').addEventListener('click', saveEnquiry);
+$('new').addEventListener('click', newEnquiry);
+$('c-staff').value = store.get(localStorage, 'mm_staff_name');
+$('c-staff').addEventListener('change', () => store.set(localStorage, 'mm_staff_name', $('c-staff').value.trim()));
+
+$('date').min = new Date().toISOString().slice(0, 10);
+renderAddons();
+update();
+showApp(Boolean(pin));
+if (pin) resetIdle();
+</script>
+</body>
+</html>
