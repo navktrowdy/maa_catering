@@ -708,7 +708,6 @@ function whatsappText(c) {
   const name = $('c-name').value.trim();
   const when = [c.s.date && `on ${fmtDate(c.s.date)}`, c.s.time && `at ${fmtTime(c.s.time)}`].filter(Boolean).join(' ');
   const items = c.lines.filter(l => l.quote).map(l => l.quote);
-  if (c.groupPct) items.push(`Group rate for ${c.s.guests} guests — ${c.groupPct}% off`);
   if (c.pct) items.push(`Discount — ${c.pct}%`);
   return [
     `Hi ${name || 'there'},`,
