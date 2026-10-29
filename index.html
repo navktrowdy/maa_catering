@@ -86,12 +86,22 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 .addon-name { font-weight: 500; }
 .addon-meta { font-size: 13px; color: rgba(245,240,232,0.72); }
 .tag-veg { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: .06em; color: var(--tag-veg); border: 1px solid var(--tag-veg); border-radius: 6px; padding: 0 5px; margin-left: 6px; vertical-align: 2px; }
+.addon-ctl { display: flex; align-items: center; gap: 10px; }
+.tog { min-width: 52px; height: 32px; border-radius: 999px; border: 1px solid var(--accent-primary); background: var(--accent-primary); color: var(--background); font-weight: 600; font-size: 13px; cursor: pointer; }
+.addon.off .tog { background: transparent; color: var(--foreground-muted); border-color: var(--border-medium); }
+.addon.off > div:first-child, .addon.off .stepper { opacity: 0.45; }
 .stepper { display: inline-flex; align-items: center; border: 1px solid var(--border-medium); border-radius: 999px; overflow: hidden; background: rgba(0,0,0,0.2); }
 .stepper button { width: 40px; height: 40px; border: none; background: transparent; color: var(--accent-primary); font-size: 20px; cursor: pointer; }
 .stepper button:hover { background: rgba(250,206,11,0.15); }
 .stepper input { width: 56px; min-height: 0; height: 40px; padding: 0; text-align: center; border: none; border-radius: 0; background: transparent; -moz-appearance: textfield; }
 .stepper input::-webkit-outer-spin-button, .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
+.check { display: flex; align-items: center; gap: 10px; margin-top: 16px; font-size: 15px; cursor: pointer; }
+.check input { width: 20px; height: 20px; accent-color: var(--accent-primary); }
+.custom-row { display: grid; grid-template-columns: minmax(0, 1fr) 80px 100px 44px; gap: 8px; align-items: center; padding: 8px 0; }
+.custom-row input { min-height: 44px; padding: 10px 12px; }
+.custom-row .rm { height: 44px; border: 1px solid var(--border-medium); border-radius: 10px; background: transparent; color: var(--accent-primary); font-size: 20px; cursor: pointer; }
+@media (max-width: 600px) { .custom-row { grid-template-columns: 1fr 1fr 44px; } .custom-row .name { grid-column: 1 / -1; } }
 .approval { margin-top: 18px; padding: 18px; border-radius: 12px; border: 1px solid var(--accent-primary); background: rgba(250,206,11,0.08); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: end; }
 @media (max-width: 600px) { .approval { grid-template-columns: 1fr; } }
 .approval .hint { grid-column: 1 / -1; }
@@ -193,17 +203,20 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
           </select>
         </label>
       </div>
+      <label class="check"><input type="checkbox" id="packing" checked> Include packaging ($25 under 30 pax, $30 for 30+)</label>
+      <p class="hint" style="margin-top:10px" id="group-hint"></p>
     </section>
 
     <section class="panel" aria-labelledby="s2">
       <div class="step-head"><span class="step-num">2</span><h2 id="s2">Biryani</h2></div>
       <div class="choice-group" role="radiogroup" aria-label="Biryani">
-        <label class="choice"><input type="radio" name="biryani" value="chicken" checked><span><b>Madurai Chicken</b><small>$17 per head</small></span></label>
-        <label class="choice"><input type="radio" name="biryani" value="mutton"><span><b>Seeraga Samba / Basmati Mutton</b><small>$22 adult · $12 child</small></span></label>
+        <label class="choice"><input type="radio" name="biryani" value="chicken" checked><span><b>Madurai Chicken</b><small>$16 per head</small></span></label>
+        <label class="choice"><input type="radio" name="biryani" value="mutton"><span><b>Seeraga Samba Mutton</b><small>$19 adult · $12 child</small></span></label>
         <label class="choice"><input type="radio" name="biryani" value="mix"><span><b>Both, half-and-half</b><small>Non-veg guests split evenly</small></span></label>
         <label class="choice"><input type="radio" name="biryani" value="none"><span><b>No biryani</b><small>Starters and sides only</small></span></label>
       </div>
-      <p class="hint" style="margin-top:14px">Vegetarian guests get Veg Biryani at $14 per head. Raita and Biryani Salna are included with every biryani order (1 batch per ~30 pax). Children's pricing applies to mutton biryani only.</p>
+      <label class="check"><input type="checkbox" id="vegbir" checked> Vegetarian guests get Veg Biryani ($11 per head)</label>
+      <p class="hint" style="margin-top:10px">Raita and Biryani Salna are included with every biryani order (1 batch per ~30 pax). Children's pricing applies to mutton biryani only.</p>
     </section>
 
     <section class="panel" aria-labelledby="s3">
@@ -216,6 +229,9 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
         </div>
       </div>
       <div id="addons"></div>
+      <h3 class="addon-cat">Other items <span class="hint" style="font-family:var(--font-body)">· anything not on the list — name, quantity, price each</span></h3>
+      <div id="custom"></div>
+      <button type="button" class="btn btn-ghost" id="add-custom" style="margin-top:8px">+ Add item</button>
     </section>
 
     <section class="panel" aria-labelledby="s4">
@@ -308,12 +324,16 @@ const QUOTE_SIGNOFF = 'MaaMadurai Street Food\n0431 525 366';
 
 // ---------- Catering rates ----------
 const BIRYANI = {
-  chicken: { name: 'Madurai Chicken Biryani', adult: 17, kid: 17 },
-  mutton:  { name: 'Seeraga Samba / Basmati Mutton Biryani', adult: 22, kid: 12 },
-  veg:     { name: 'Veg Biryani', adult: 14, kid: 14 }
+  chicken: { name: 'Madurai Chicken Biryani', adult: 16, kid: 16 },
+  mutton:  { name: 'Seeraga Samba Mutton Biryani', adult: 19, kid: 12 },
+  veg:     { name: 'Veg Biryani', adult: 11, kid: 11 }
 };
 const PAX_PER_BATCH = 30;                 // one gravy / raita / salna batch serves ~30
 const PACKAGING = { small: 25, large: 30, largeFrom: 30 };
+// Base rates are for up to 29 guests; bigger groups get a lower rate on food (not packaging).
+// Above 75 guests keeps the 50–75 rate.
+const GROUP_RATES = [{ from: 50, off: 10 }, { from: 40, off: 5 }, { from: 30, off: 2 }];
+const groupOff = guests => (GROUP_RATES.find(t => guests >= t.from) || { off: 0 }).off;
 const DISCOUNT_LIMIT = 5;                 // must match DISCOUNT_LIMIT in Code.gs
 
 // Kitchen prep assumptions
@@ -321,27 +341,40 @@ const PREP = { meatKg: 0.15, riceKg: 0.12, starterKg: 0.15, buffer: 1.05, gravyL
 const CHAMI_FROM = 60;                    // chicken pax that needs a pre-order from Chami
 const MUTTON_WARN_FROM = 20;              // mutton biryani pax that needs 3 days' notice
 
-// unit: pp = per head, ea = per piece, batch = per batch
+// unit: pp = per head, ea = per piece, kg = per kg, L = per litre, serve = per serve, batch = per batch
 // kind: starter / side items get prep kg; meat: drives pre-order labels
 const ADDONS = [
-  { cat: 'Starters', id: 'c65b',  name: 'Chicken 65 (bone-in)',   price: 7,  unit: 'pp', kind: 'starter', meat: 'chicken', suggest: s => s.nonVeg },
+  { cat: 'Starters', id: 'c65b',  name: 'Chicken 65',             price: 75, unit: 'kg', kind: 'starter', meat: 'chicken', suggest: s => Math.ceil(s.nonVeg * PREP.starterKg) },
   { cat: 'Starters', id: 'c65l',  name: 'Chicken 65 (boneless)',  price: 8,  unit: 'pp', kind: 'starter', meat: 'chicken' },
-  { cat: 'Starters', id: 'gobi',  name: 'Gobi 65',                price: 6,  unit: 'pp', kind: 'starter', veg: true, suggest: s => s.veg },
-  { cat: 'Starters', id: 'kola',  name: 'Madurai Kola Urundai',   price: 6,  unit: 'pp', kind: 'starter', meat: 'mutton', note: '3 pcs per head' },
-  { cat: 'Dry sides', id: 'pepch', name: 'Madurai Pepper Chicken', price: 8,  unit: 'pp', kind: 'side', meat: 'chicken' },
-  { cat: 'Dry sides', id: 'chuk',  name: 'Madurai Mutton Chukka',  price: 10, unit: 'pp', kind: 'side', meat: 'mutton' },
-  { cat: 'Dry sides', id: 'pbm',   name: 'Paneer Butter Masala',   price: 12, unit: 'pp', kind: 'side', veg: true, min: 10 },
-  { cat: 'Breads', id: 'par',  name: 'Plain Parotta', price: 2.5, unit: 'ea', veg: true },
-  { cat: 'Breads', id: 'chap', name: 'Chapathi',      price: 2.5, unit: 'ea', veg: true },
-  { cat: 'Gravies', id: 'cgr',   name: 'Chicken Gravy',                    price: 55, unit: 'batch', gravy: true },
-  { cat: 'Gravies', id: 'vgr',   name: 'Veg / Kathirikai (Brinjal) Gravy', price: 50, unit: 'batch', gravy: true, veg: true },
+  { cat: 'Starters', id: 'gobi',  name: 'Gobi 65',                price: 45, unit: 'kg', kind: 'starter', veg: true, suggest: s => Math.ceil(s.veg * PREP.starterKg) },
+  { cat: 'Starters', id: 'pan65', name: 'Paneer 65',              price: 55, unit: 'kg', kind: 'starter', veg: true },
+  { cat: 'Starters', id: 'kola',  name: 'Madurai Kola Urundai',   price: 8,  unit: 'serve', kind: 'starter', meat: 'mutton', each: 'per serve (3 pcs)' },
+  { cat: 'Sides', id: 'pepch', name: 'Madurai Pepper Chicken', price: 60, unit: 'kg', kind: 'side', meat: 'chicken' },
+  { cat: 'Sides', id: 'chuk',  name: 'Madurai Mutton Chukka',  price: 80, unit: 'kg', kind: 'side', meat: 'mutton' },
+  { cat: 'Sides', id: 'pbm',   name: 'Paneer Butter Masala',   price: 12, unit: 'pp', kind: 'side', veg: true, min: 10 },
+  { cat: 'Sides', id: 'paya',  name: 'Aatukal Paya',           price: 10, unit: 'serve', meat: 'mutton', each: 'per serve (3 pcs + 200 ml)' },
+  { cat: 'Sides', id: 'curd',  name: 'Curd Rice',              price: 2.5, unit: 'serve', veg: true },
+  { cat: 'Parotta & breads', id: 'parveg', name: 'Parotta & Veg Gravy',     price: 10,  unit: 'serve', veg: true, each: 'per serve (2 pcs + 200 ml)' },
+  { cat: 'Parotta & breads', id: 'parchk', name: 'Parotta & Chicken Gravy', price: 12,  unit: 'serve', each: 'per serve (2 pcs + 200 ml)' },
+  { cat: 'Parotta & breads', id: 'par',    name: 'Plain Parotta',           price: 2.5, unit: 'ea', veg: true },
+  { cat: 'Parotta & breads', id: 'chap',   name: 'Chapathi',                price: 0.9, unit: 'ea', veg: true },
+  { cat: 'Tiffin', id: 'idly',   name: 'Idly',       price: 3,   unit: 'ea', veg: true },
+  { cat: 'Tiffin', id: 'vadai',  name: 'Vadai',      price: 1.8, unit: 'ea', veg: true },
+  { cat: 'Tiffin', id: 'poori',  name: 'Poori',      price: 3,   unit: 'ea', veg: true },
+  { cat: 'Tiffin', id: 'pongal', name: 'Ven Pongal', price: 17,  unit: 'kg', veg: true },
+  { cat: 'Tiffin', id: 'kesari', name: 'Kesari',     price: 17,  unit: 'kg', veg: true },
+  { cat: 'Gravies', id: 'cgr',   name: 'Chicken Gravy',                    price: 25, unit: 'L', gravy: true },
+  { cat: 'Gravies', id: 'vgr',   name: 'Veg / Kathirikai (Brinjal) Gravy', price: 50, unit: 'batch', gravy: true, veg: true, note: '1 batch serves ~30 pax' },
   { cat: 'Gravies', id: 'salna', name: 'Biryani Salna — extra batch',      price: 35, unit: 'batch', gravy: true, note: 'Included with biryani; add only for extra' },
   { cat: 'Gravies', id: 'raita', name: 'Raita — extra batch',              price: 35, unit: 'batch', gravy: true, veg: true, note: 'Included with biryani; add only for extra' },
+  { cat: 'Desserts', id: 'halwa', name: 'Bread Halwa', price: 40, unit: 'kg', veg: true },
+  { cat: 'Desserts', id: 'payas', name: 'Payasam',     price: 2,  unit: 'ea', veg: true, each: 'per cup' },
   { cat: 'Desserts', id: 'rasm',  name: 'Rasmalai',    price: 1, unit: 'ea', veg: true, min: 100 },
   { cat: 'Desserts', id: 'gulab', name: 'Gulab Jamun', price: 2, unit: 'ea', veg: true, note: 'Suggest 3 per head', suggest: s => s.guests * 3 },
+  { cat: 'Drinks', id: 'cofcup', name: 'Filter Coffee (cup)', price: 3,    unit: 'ea', veg: true },
   { cat: 'Drinks', id: 'cof',   name: 'Filter Coffee',       price: 50,    unit: 'batch', veg: true, each: 'per 4L batch' },
   { cat: 'Drinks', id: 'tea',   name: 'Masala Tea',          price: 40,    unit: 'batch', veg: true, each: 'per 4L batch' },
-  { cat: 'Drinks', id: 'jig',   name: 'Madurai Jigarthanda', price: 12.99, unit: 'ea', veg: true },
+  { cat: 'Drinks', id: 'jig',   name: 'Madurai Jigarthanda', price: 8.5,   unit: 'ea', veg: true },
   { cat: 'Drinks', id: 'rose',  name: 'Rose Milk',           price: 5.99,  unit: 'ea', veg: true },
   { cat: 'Drinks', id: 'lassi', name: 'Mango Lassi',         price: 5.99,  unit: 'ea', veg: true },
   { cat: 'Drinks', id: 'goli',  name: 'Goli Soda',           price: 5.99,  unit: 'ea', veg: true },
@@ -350,10 +383,18 @@ const ADDONS = [
 const UNIT = {
   pp:    { each: 'per head',  qty: n => `${n} pax` },
   ea:    { each: 'each',      qty: n => `${n} pcs` },
+  kg:    { each: 'per kg',    qty: n => `${n} kg` },
+  L:     { each: 'per litre', qty: n => `${n} L` },
+  serve: { each: 'per serve', qty: n => `${n} serve${n === 1 ? '' : 's'}` },
   batch: { each: 'per batch', qty: n => `${n} batch${n === 1 ? '' : 'es'}` }
 };
-const CAT_NOTE = { Gravies: '1 batch serves ~30 pax' };
+const CAT_NOTE = {};
+// Head-count equivalent of a starter/side order (kg items at PREP.starterKg per head)
+const paxOf = a => !active(a) ? 0 : a.unit === 'kg' ? Math.round(qty[a.id] / PREP.starterKg) : qty[a.id];
 const qty = Object.fromEntries(ADDONS.map(a => [a.id, 0]));
+const on = Object.fromEntries(ADDONS.map(a => [a.id, true]));   // switched-off items keep their quantity
+const active = a => qty[a.id] > 0 && on[a.id];
+let custom = [];   // staff-entered items: { name, qty, price }
 
 const $ = id => document.getElementById(id);
 const money = n => n.toLocaleString('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
@@ -477,7 +518,7 @@ function readInputs() {
   const veg = Math.min(int($('veg').value, 0), guests);
   const kids = Math.min(int($('kids').value, 0), guests);
   const biryani = document.querySelector('input[name=biryani]:checked').value;
-  return { guests, veg, kids, nonVeg: guests - veg, biryani, date: $('date').value, time: $('time').value, fulfil: $('c-fulfil').value };
+  return { guests, veg, kids, nonVeg: guests - veg, biryani, vegBiryani: $('vegbir').checked, packing: $('packing').checked, date: $('date').value, time: $('time').value, fulfil: $('c-fulfil').value };
 }
 
 // Who eats which biryani. Children are counted among the non-veg guests;
@@ -494,7 +535,7 @@ function biryaniSplit(s) {
     out.muttonKids = s.nonVeg ? Math.round(kidsNV * mutton / s.nonVeg) : 0;
     out.muttonAdults = mutton - out.muttonKids;
   }
-  out.veg = s.veg;
+  out.veg = s.vegBiryani ? s.veg : 0;
   return out;
 }
 
@@ -527,23 +568,34 @@ function compute() {
   }
 
   for (const a of ADDONS) {
-    const q = qty[a.id];
-    if (!q) continue;
-    const u = UNIT[a.unit];
-    lines.push({ group: a.cat, name: a.name, detail: `${u.qty(q)} × ${money(a.price)}`, amt: q * a.price, quote: `${a.name.replace(' — extra batch', ' (extra)')} — ${u.qty(q)}` });
+    if (!active(a)) continue;
+    const q = qty[a.id], u = UNIT[a.unit];
+    lines.push({ group: a.cat, name: a.name, detail: `${u.qty(q)} × ${money(a.price)}`, amt: round2(q * a.price), quote: `${a.name.replace(' — extra batch', ' (extra)')} — ${u.qty(q)}` });
   }
 
-  if (s.guests) {
+  for (const x of custom) {
+    const name = x.name.trim(), q = int(x.qty), p = Math.max(0, Number(x.price) || 0);
+    if (!name || !q) continue;
+    lines.push({ group: 'Other items', name, detail: `${q} × ${money(p)}`, amt: round2(q * p), quote: `${name} — ${q}` });
+  }
+
+  const food = round2(lines.reduce((t, l) => t + l.amt, 0));
+  const groupPct = groupOff(s.guests);
+  const groupDiscount = round2(food * groupPct / 100);
+
+  let packaging = 0;
+  if (s.guests && s.packing) {
     const large = s.guests >= PACKAGING.largeFrom;
-    lines.push({ group: 'Packaging', name: large ? 'Large packaging' : 'Standard packaging', detail: large ? `${PACKAGING.largeFrom}+ pax` : `under ${PACKAGING.largeFrom} pax`, amt: large ? PACKAGING.large : PACKAGING.small, quote: 'Packaging' });
+    packaging = large ? PACKAGING.large : PACKAGING.small;
+    lines.push({ group: 'Packaging', name: large ? 'Large packaging' : 'Standard packaging', detail: large ? `${PACKAGING.largeFrom}+ pax` : `under ${PACKAGING.largeFrom} pax`, amt: packaging, quote: 'Packaging' });
   }
 
-  const subtotal = round2(lines.reduce((t, l) => t + l.amt, 0));
+  const subtotal = round2(food - groupDiscount + packaging);
   const pct = discountPct();
   const discount = round2(subtotal * pct / 100);
   const total = round2(subtotal - discount);
   const perGuest = s.guests ? round2(total / s.guests) : 0;
-  return { s, b, muttonPax, biryaniPax, includedBatches, lines, subtotal, pct, discount, total, perGuest };
+  return { s, b, muttonPax, biryaniPax, includedBatches, lines, food, groupPct, groupDiscount, packaging, subtotal, pct, discount, total, perGuest };
 }
 
 function renderAddons() {
@@ -554,13 +606,15 @@ function renderAddons() {
       html += `<h3 class="addon-cat">${cat}${CAT_NOTE[cat] ? ` <span class="hint" style="font-family:var(--font-body)">· ${CAT_NOTE[cat]}</span>` : ''}</h3>`;
     }
     const meta = [`${money(a.price)} ${a.each || UNIT[a.unit].each}`, a.min && `min ${a.min}`, a.note].filter(Boolean).join(' · ');
-    html += `<div class="addon">
+    html += `<div class="addon${on[a.id] ? '' : ' off'}" data-row="${a.id}">
       <div><div class="addon-name">${a.name}${a.veg ? '<span class="tag-veg">VEG</span>' : ''}</div><div class="addon-meta">${meta}</div></div>
+      <div class="addon-ctl">
+      <button type="button" class="tog" data-tog="${a.id}" aria-pressed="${on[a.id]}" aria-label="${a.name} on or off">${on[a.id] ? 'On' : 'Off'}</button>
       <div class="stepper">
         <button type="button" data-id="${a.id}" data-d="-1" aria-label="One less ${a.name}">−</button>
         <input type="number" min="0" inputmode="numeric" data-id="${a.id}" value="${qty[a.id]}" aria-label="${a.name} quantity">
         <button type="button" data-id="${a.id}" data-d="1" aria-label="One more ${a.name}">+</button>
-      </div></div>`;
+      </div></div></div>`;
   }
   $('addons').innerHTML = html;
 }
@@ -579,6 +633,15 @@ function suggest() {
   update();
 }
 
+const esc = s => String(s).replace(/[&<>"]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch]);
+function renderCustom() {
+  $('custom').innerHTML = custom.map((x, i) => `<div class="custom-row">
+    <input class="name" type="text" data-i="${i}" data-f="name" value="${esc(x.name)}" placeholder="e.g. Sambar (litres)" aria-label="Item name">
+    <input type="number" min="0" inputmode="numeric" data-i="${i}" data-f="qty" value="${esc(x.qty)}" placeholder="Qty" aria-label="Quantity">
+    <input type="number" min="0" step="0.01" inputmode="decimal" data-i="${i}" data-f="price" value="${esc(x.price)}" placeholder="$ each" aria-label="Price each">
+    <button type="button" class="rm" data-rm="${i}" aria-label="Remove item">×</button></div>`).join('');
+}
+
 function syncAddonInputs() {
   document.querySelectorAll('#addons input').forEach(i => { i.value = qty[i.dataset.id]; });
 }
@@ -594,7 +657,8 @@ function warningsFor(c) {
     if (ev.getDay() === 6) out.push({ text: 'Saturday booking — confirm kitchen capacity with Nalini before quoting' });
   }
   if (c.muttonPax >= MUTTON_WARN_FROM) out.push({ text: 'Pre-order mutton from Sakayanathan at least 3 days ahead' });
-  if (qty.c65b + qty.c65l >= CHAMI_FROM) out.push({ text: 'Pre-order chicken from Chami' });
+  const c65 = ADDONS.filter(a => a.id === 'c65b' || a.id === 'c65l').reduce((t, a) => t + paxOf(a), 0);
+  if (c65 >= CHAMI_FROM) out.push({ text: 'Pre-order chicken from Chami' });
   return out;
 }
 
@@ -610,21 +674,29 @@ function prepHtml(c) {
   if (meat.length) rows.push('<tr><th colspan="2">Meat</th></tr>', ...meat);
   if (c.biryaniPax) rows.push('<tr><th colspan="2">Rice</th></tr>', row(`Biryani rice (${c.biryaniPax} pax)`, kg(c.biryaniPax * PREP.riceKg * PREP.buffer)));
 
-  const starters = ADDONS.filter(a => (a.kind === 'starter' || a.kind === 'side') && qty[a.id]).map(a =>
-    row(`${a.name} (${qty[a.id]} pax)`, kg(qty[a.id] * PREP.starterKg * PREP.buffer), a.meat === 'chicken' ? chickenChip(qty[a.id]) : chip(a.meat)));
+  // kg items: ordered kg + buffer; per-head / per-serve items: grams per head + buffer
+  const starters = ADDONS.filter(a => (a.kind === 'starter' || a.kind === 'side') && active(a)).map(a =>
+    row(`${a.name} (${UNIT[a.unit].qty(qty[a.id])})`,
+      kg((a.unit === 'kg' ? qty[a.id] : qty[a.id] * PREP.starterKg) * PREP.buffer),
+      a.meat === 'chicken' ? chickenChip(paxOf(a)) : chip(a.meat)));
   if (starters.length) rows.push('<tr><th colspan="2">Starters &amp; sides</th></tr>', ...starters);
 
   const L = PREP.gravyLitresPerBatch;
   const gravies = [];
+  const extra = id => active(ADDONS.find(a => a.id === id)) ? qty[id] : 0;
   if (c.includedBatches) {
-    gravies.push(row(`Biryani Salna (${c.includedBatches + qty.salna} batch)`, `${(c.includedBatches + qty.salna) * L} L`));
-    gravies.push(row(`Raita (${c.includedBatches + qty.raita} batch)`, `${(c.includedBatches + qty.raita) * L} L`));
+    gravies.push(row(`Biryani Salna (${c.includedBatches + extra('salna')} batch)`, `${(c.includedBatches + extra('salna')) * L} L`));
+    gravies.push(row(`Raita (${c.includedBatches + extra('raita')} batch)`, `${(c.includedBatches + extra('raita')) * L} L`));
   }
-  for (const a of ADDONS.filter(a => a.gravy && qty[a.id])) {
+  for (const a of ADDONS.filter(a => a.gravy && active(a))) {
     if (c.includedBatches && (a.id === 'salna' || a.id === 'raita')) continue;
-    gravies.push(row(`${a.name.replace(' — extra batch', '')} (${qty[a.id]} batch)`, `${qty[a.id] * L} L`));
+    gravies.push(a.unit === 'L'
+      ? row(a.name, `${qty[a.id]} L`)
+      : row(`${a.name.replace(' — extra batch', '')} (${qty[a.id]} batch)`, `${qty[a.id] * L} L`));
   }
   if (gravies.length) rows.push(`<tr><th colspan="2">Gravies · ${L} L per batch</th></tr>`, ...gravies);
+  const kgItems = ADDONS.filter(a => a.unit === 'kg' && !a.kind && active(a)).map(a => row(a.name, kg(qty[a.id])));
+  if (kgItems.length) rows.push('<tr><th colspan="2">Other (as ordered)</th></tr>', ...kgItems);
 
   if (!rows.length) return '<p class="hint" style="padding-top:4px">Nothing to prep yet.</p>';
   return `<table>${rows.join('')}</table><p class="hint" style="margin-top:10px">Meat ${PREP.meatKg * 1000} g, rice ${PREP.riceKg * 1000} g and starters ${PREP.starterKg * 1000} g per head, plus 5% buffer.</p>`;
@@ -638,6 +710,7 @@ function whatsappText(c) {
   const name = $('c-name').value.trim();
   const when = [c.s.date && `on ${fmtDate(c.s.date)}`, c.s.time && `at ${fmtTime(c.s.time)}`].filter(Boolean).join(' ');
   const items = c.lines.filter(l => l.quote).map(l => l.quote);
+  if (c.groupPct) items.push(`Group rate for ${c.s.guests} guests — ${c.groupPct}% off`);
   if (c.pct) items.push(`Discount — ${c.pct}%`);
   return [
     `Hi ${name || 'there'},`,
@@ -666,9 +739,16 @@ function update() {
   }
   $('lines').innerHTML = html || '<li class="empty" style="border:none">Enter the headcount to see an estimate.</li>';
 
-  $('sums').innerHTML = c.pct
-    ? `<div><span>Subtotal</span><span>${money(c.subtotal)}</span></div><div><span>Discount (${c.pct}%)</span><span>−${money(c.discount)}</span></div>`
-    : '';
+  const sums = [];
+  if (c.groupPct) {
+    sums.push(['Food', money(c.food)], [`Group rate, ${c.s.guests} guests (${c.groupPct}%)`, `−${money(c.groupDiscount)}`]);
+    if (c.packaging) sums.push(['Packaging', money(c.packaging)]);
+  }
+  if (c.pct) sums.push(['Subtotal', money(c.subtotal)], [`Discount (${c.pct}%)`, `−${money(c.discount)}`]);
+  $('sums').innerHTML = sums.map(([k, v]) => `<div><span>${k}</span><span>${v}</span></div>`).join('');
+  const next = GROUP_RATES.slice().reverse().find(t => c.s.guests < t.from);
+  $('group-hint').textContent = (c.groupPct ? `Group rate: ${c.groupPct}% off food for ${c.s.guests} guests.` : 'Base rates (under 30 guests).')
+    + (next ? ` ${next.off}% off from ${next.from} guests.` : '');
   $('total').textContent = money(c.total);
   $('perhead').textContent = c.s.guests ? `${money(c.perGuest)} per head` : '';
   $('for').textContent = c.s.guests
@@ -703,7 +783,8 @@ async function saveEnquiry() {
     email: $('c-email').value.trim(), eventDate: c.s.date, eventTime: c.s.time ? fmtTime(c.s.time) : '',
     eventType: $('c-type').value, fulfilment: c.s.fulfil, suburb: $('c-suburb').value.trim(),
     guests: c.s.guests, veg: c.s.veg, kids: c.s.kids, biryani: BIRYANI_LABEL[c.s.biryani],
-    lines: c.lines.map(l => `${l.name} — ${l.detail}${l.included ? ' (included)' : ' = ' + money(l.amt)}`).join('\n'),
+    lines: c.lines.map(l => `${l.name} — ${l.detail}${l.included ? ' (included)' : ' = ' + money(l.amt)}`)
+      .concat(c.groupPct ? [`Group rate ${c.groupPct}% off food = −${money(c.groupDiscount)}`] : []).join('\n'),
     subtotal: c.subtotal, discountPct: c.pct, discount: c.discount, total: c.total, perGuest: c.perGuest,
     managerPin: c.pct > DISCOUNT_LIMIT ? approval.managerPin : '',
     notes: $('c-notes').value.trim()
@@ -734,9 +815,13 @@ function newEnquiry() {
   ['veg', 'kids', 'disc'].forEach(id => { $(id).value = 0; });
   ['date', 'time', 'c-name', 'c-phone', 'c-email', 'c-suburb', 'c-notes', 'mgr-pin'].forEach(id => { $(id).value = ''; });
   document.querySelector('input[name=biryani][value=chicken]').checked = true;
+  $('vegbir').checked = true;
+  $('packing').checked = true;
   $('c-type').selectedIndex = 0; $('c-fulfil').selectedIndex = 0;
-  for (const k in qty) qty[k] = 0;
-  syncAddonInputs();
+  for (const k in qty) { qty[k] = 0; on[k] = true; }
+  renderAddons();
+  custom = [];
+  renderCustom();
   approval = { pct: 0, managerPin: '' };
   savedId = '';
   $('saved').hidden = true;
@@ -749,7 +834,19 @@ function newEnquiry() {
 // ---------- Events ----------
 ['guests', 'veg', 'kids', 'date', 'time', 'disc', 'c-fulfil', 'c-name'].forEach(id => $(id).addEventListener('input', update));
 document.querySelectorAll('input[name=biryani]').forEach(r => r.addEventListener('change', update));
+$('vegbir').addEventListener('change', update);
+$('packing').addEventListener('change', update);
 $('addons').addEventListener('click', e => {
+  const t = e.target.closest('[data-tog]');
+  if (t) {
+    const id = t.dataset.tog;
+    on[id] = !on[id];
+    t.closest('.addon').classList.toggle('off', !on[id]);
+    t.textContent = on[id] ? 'On' : 'Off';
+    t.setAttribute('aria-pressed', on[id]);
+    update();
+    return;
+  }
   const b = e.target.closest('button[data-id]');
   if (!b) return;
   const a = ADDONS.find(x => x.id === b.dataset.id);
@@ -762,6 +859,24 @@ $('addons').addEventListener('change', e => {
   if (!a) return;
   setQty(a, e.target.value);
   syncAddonInputs();
+  update();
+});
+$('add-custom').addEventListener('click', () => {
+  custom.push({ name: '', qty: '', price: '' });
+  renderCustom();
+  $('custom').querySelector('.custom-row:last-child .name').focus();
+});
+$('custom').addEventListener('input', e => {
+  const { i, f } = e.target.dataset;
+  if (i === undefined) return;
+  custom[i][f] = e.target.value;
+  update();
+});
+$('custom').addEventListener('click', e => {
+  const rm = e.target.closest('[data-rm]');
+  if (!rm) return;
+  custom.splice(Number(rm.dataset.rm), 1);
+  renderCustom();
   update();
 });
 $('suggest').addEventListener('click', suggest);
