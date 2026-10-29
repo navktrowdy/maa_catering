@@ -42,7 +42,6 @@ button { font-family: inherit; }
 .hero h1 { font-size: clamp(28px, 4.4vw, 48px); font-variant: small-caps; margin: 10px 0 14px; }
 .hero p { color: var(--foreground-muted); font-size: 17px; margin: 0; text-wrap: pretty; }
 .rule { width: 96px; height: 4px; background: var(--accent-primary); margin: 22px auto 0; }
-.lock-btn { position: absolute; top: 16px; right: 16px; }
 
 .layout { max-width: 1280px; margin: 0 auto; padding: 8px 16px 56px; display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 28px; align-items: start; }
 @media (max-width: 960px) { .layout { grid-template-columns: 1fr; } }
@@ -130,6 +129,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
   <form class="lock-card" id="lock-form">
     <span class="eyebrow">MaaMadurai · Staff only</span>
     <h1>Catering Calculator</h1>
+    <p class="hint">Type the shop PIN. This device remembers it.</p>
     <label class="field">Staff PIN
       <input id="pin" type="password" inputmode="numeric" autocomplete="off" maxlength="8" required>
     </label>
@@ -140,7 +140,6 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 
 <div id="app" hidden>
 <header class="hero">
-  <button type="button" class="btn btn-ghost lock-btn" id="lock-now">Lock</button>
   <span class="eyebrow">MaaMadurai · Front of house</span>
   <h1>Catering Calculator</h1>
   <p>Size the buckets, starters and sides for a customer's function, quote the estimate, and log the enquiry to the spreadsheet.</p>
@@ -249,6 +248,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
       <button type="button" class="btn btn-ghost" id="new">Start new enquiry</button>
     </div>
     <p class="fine">Quote this to the customer as an estimate at in-store prices (AUD, updated 12 September 2026). Final quantities and price are confirmed when they order. Delivery is by arrangement. Chicken and mutton are halal; one kitchen, so no allergen-free guarantee.</p>
+    <p class="fine"><a href="#" id="forget" style="color:inherit">Forget the PIN on this device</a></p>
   </aside>
 </main>
 </div>
@@ -256,9 +256,8 @@ input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-
 <div class="toast" id="toast" role="status"></div>
 
 <script>
-// Paste the Apps Script web app URL here after deploying it (see SETUP.md)
+// Paste the Apps Script web app URL between the quotes (see README.md)
 const ENQUIRY_ENDPOINT = '';
-const IDLE_LOCK_MS = 20 * 60 * 1000;
 
 // Prices from Menu.dc.html / Catering.dc.html (in-store, updated 12 Sep 2026)
 const BUCKETS = {
@@ -309,7 +308,7 @@ const PIN_ERRORS = {
   locked: 'Too many wrong tries. Wait 10 minutes and try again.',
   pin_not_set: 'No staff PIN is set yet. Use Catering > Set staff PIN in the spreadsheet.'
 };
-let pin = store.get(sessionStorage, 'mm_staff_pin');
+let pin = store.get(localStorage, 'mc-pin');
 
 async function callSheet(payload) {
   // text/plain keeps this a "simple" request, so Apps Script needs no CORS preflight
@@ -325,23 +324,22 @@ function showApp(on) {
 
 function lock() {
   pin = '';
-  store.set(sessionStorage, 'mm_staff_pin', '');
+  store.set(localStorage, 'mc-pin', '');
   showApp(false);
 }
 
 $('lock-form').addEventListener('submit', async e => {
   e.preventDefault();
   const entered = $('pin').value.trim();
-  if (!ENQUIRY_ENDPOINT) { $('pin-err').textContent = 'The spreadsheet is not connected yet. Add the web app URL to this page (see SETUP.md).'; return; }
+  if (!ENQUIRY_ENDPOINT) { $('pin-err').textContent = 'Not set up yet. The owner needs to add the Google Sheet link to the page.'; return; }
   $('unlock').disabled = true;
   $('pin-err').textContent = '';
   try {
     const r = await callSheet({ action: 'verify', pin: entered });
     if (r.ok) {
       pin = entered;
-      store.set(sessionStorage, 'mm_staff_pin', pin);
+      store.set(localStorage, 'mc-pin', pin);
       showApp(true);
-      resetIdle();
     } else {
       $('pin-err').textContent = PIN_ERRORS[r.error] || 'Could not check the PIN.';
       $('pin').select();
@@ -351,14 +349,7 @@ $('lock-form').addEventListener('submit', async e => {
   }
   $('unlock').disabled = false;
 });
-$('lock-now').addEventListener('click', lock);
-
-let idleTimer;
-function resetIdle() {
-  clearTimeout(idleTimer);
-  if (pin) idleTimer = setTimeout(lock, IDLE_LOCK_MS);
-}
-['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, resetIdle, { passive: true }));
+$('forget').addEventListener('click', e => { e.preventDefault(); lock(); });
 
 // ---------- Calculator ----------
 // Cheapest mix of full/half buckets that serves at least `n` guests.
@@ -527,7 +518,7 @@ async function saveEnquiry() {
       toast(`Enquiry saved as ${r.id}`);
       return;
     }
-    if (r.error === 'bad_pin' || r.error === 'locked') { toast('The staff PIN has changed — unlock again'); lock(); }
+    if (r.error === 'bad_pin' || r.error === 'locked') { lock(); $('pin-err').textContent = 'The PIN has changed. Type the new one, then save again.'; }
     else toast('The spreadsheet rejected the enquiry. Use Copy estimate as a backup.');
   } catch (err) {
     toast('Could not reach the spreadsheet. Use Copy estimate as a backup.');
@@ -583,7 +574,6 @@ $('date').min = new Date().toISOString().slice(0, 10);
 renderAddons();
 update();
 showApp(Boolean(pin));
-if (pin) resetIdle();
 </script>
 </body>
 </html>
